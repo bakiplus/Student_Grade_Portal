@@ -103,20 +103,25 @@ class PhotoUploadView(APIView):
     """
     POST /api/auth/upload-photo/
     Upload student image to Cloudinary and return secure URL.
+    Falls back gracefully to Base64 Data URI if Cloudinary is unavailable.
     """
     permission_classes = [permissions.IsAuthenticated]
     parser_classes = [parsers.MultiPartParser, parsers.FormParser, parsers.JSONParser]
 
     def post(self, request):
-        image_file = request.FILES.get('image') or request.FILES.get('file') or request.data.get('image')
+        image_file = request.FILES.get('image') or request.FILES.get('file') or request.data.get('image') or request.data.get('file')
         if not image_file:
             return Response(
                 {'detail': 'No image file provided.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        # 1. If it's already a web URL string, return it directly
+        if isinstance(image_file, str) and image_file.startswith(('http://', 'https://')):
+            return Response({'photo_url': image_file}, status=status.HTTP_200_OK)
+
+        # 2. Upload to Cloudinary
         try:
-            # Upload to Cloudinary
             upload_result = cloudinary.uploader.upload(
                 image_file,
                 folder='gradeportal/students',
@@ -131,11 +136,21 @@ class PhotoUploadView(APIView):
                 'public_id': upload_result.get('public_id')
             }, status=status.HTTP_200_OK)
         except Exception as e:
-            # Fallback if URL string passed
-            if isinstance(image_file, str) and image_file.startswith(('http://', 'https://')):
-                return Response({'photo_url': image_file}, status=status.HTTP_200_OK)
+            # 3. Fallback to base64 Data URI so uploads never fail
+            try:
+                import base64
+                if hasattr(image_file, 'read'):
+                    image_file.seek(0)
+                    encoded = base64.b64encode(image_file.read()).decode('utf-8')
+                    mime = getattr(image_file, 'content_type', 'image/jpeg')
+                    return Response({'photo_url': f"data:{mime};base64,{encoded}"}, status=status.HTTP_200_OK)
+                elif isinstance(image_file, str) and image_file.startswith('data:image'):
+                    return Response({'photo_url': image_file}, status=status.HTTP_200_OK)
+            except Exception:
+                pass
+
             return Response(
-                {'detail': f'Cloudinary upload failed: {str(e)}'},
+                {'detail': f'Upload failed: {str(e)}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

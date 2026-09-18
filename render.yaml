@@ -20,11 +20,11 @@ services:
           name: gradeportal-db
           property: connectionString
       - key: CLOUDINARY_CLOUD_NAME
-        sync: false
+        value: "v5bi9mmw"
       - key: CLOUDINARY_API_KEY
-        sync: false
+        value: "158261847961528"
       - key: CLOUDINARY_API_SECRET
-        sync: false
+        value: "KejmKBc-MincnnV_MVJ2vMspxj4"
 
   # Frontend Static Site (Vite + React)
   - type: web
