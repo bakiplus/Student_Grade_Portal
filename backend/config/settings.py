@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from decouple import config, Csv
 import dj_database_url
-import cloudinary
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -89,6 +88,12 @@ else:
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
 
+# Authentication Backends (supports case-insensitive username and email login)
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -125,15 +130,20 @@ CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME', default=None)
 CLOUDINARY_API_KEY = config('CLOUDINARY_API_KEY', default=None)
 CLOUDINARY_API_SECRET = config('CLOUDINARY_API_SECRET', default=None)
 
-if CLOUDINARY_URL:
-    cloudinary.config(cloudinary_url=CLOUDINARY_URL)
-elif CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
-    cloudinary.config(
-        cloud_name=CLOUDINARY_CLOUD_NAME,
-        api_key=CLOUDINARY_API_KEY,
-        api_secret=CLOUDINARY_API_SECRET,
-        secure=True,
-    )
+if CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET):
+    try:
+        import cloudinary
+        if CLOUDINARY_URL:
+            cloudinary.config(cloudinary_url=CLOUDINARY_URL)
+        else:
+            cloudinary.config(
+                cloud_name=CLOUDINARY_CLOUD_NAME,
+                api_key=CLOUDINARY_API_KEY,
+                api_secret=CLOUDINARY_API_SECRET,
+                secure=True,
+            )
+    except Exception:
+        pass
 
 # Internationalization
 LANGUAGE_CODE = 'en-us'
