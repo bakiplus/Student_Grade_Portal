@@ -31,7 +31,10 @@ class CourseGradesView(APIView):
     def get(self, request, course_id):
         """Return all grades for a course, organized by student."""
         try:
-            course = Course.objects.get(id=course_id, instructor=request.user)
+            if request.user.is_superuser or request.user.role == 'admin':
+                course = Course.objects.get(id=course_id)
+            else:
+                course = Course.objects.get(id=course_id, instructor=request.user)
         except Course.DoesNotExist:
             return Response(
                 {'detail': 'Course not found.'},
@@ -85,7 +88,10 @@ class CourseGradesView(APIView):
     def post(self, request, course_id):
         """Bulk enter/update grades for a course."""
         try:
-            course = Course.objects.get(id=course_id, instructor=request.user)
+            if request.user.is_superuser or request.user.role == 'admin':
+                course = Course.objects.get(id=course_id)
+            else:
+                course = Course.objects.get(id=course_id, instructor=request.user)
         except Course.DoesNotExist:
             return Response(
                 {'detail': 'Course not found.'},
@@ -174,7 +180,10 @@ class CourseResultsPreviewView(APIView):
 
     def get(self, request, course_id):
         try:
-            course = Course.objects.get(id=course_id, instructor=request.user)
+            if request.user.is_superuser or request.user.role == 'admin':
+                course = Course.objects.get(id=course_id)
+            else:
+                course = Course.objects.get(id=course_id, instructor=request.user)
         except Course.DoesNotExist:
             return Response(
                 {'detail': 'Course not found.'},

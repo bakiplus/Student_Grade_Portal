@@ -18,6 +18,7 @@ from .serializers import (
     StudentLoginSerializer,
     UserSerializer,
     CreateStudentSerializer,
+    CreateInstructorSerializer,
 )
 
 
@@ -159,5 +160,30 @@ class StudentListCreateView(generics.ListCreateAPIView):
                 | models.Q(last_name__icontains=search)
                 | models.Q(student_id__icontains=search)
                 | models.Q(username__icontains=search)
+            )
+        return queryset
+
+
+class InstructorListCreateView(generics.ListCreateAPIView):
+    """
+    GET  /api/auth/instructors/ — List all instructors (instructor/admin only)
+    POST /api/auth/instructors/ — Create a new instructor account (admin only)
+    """
+    permission_classes = [IsInstructor]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return CreateInstructorSerializer
+        return UserSerializer
+
+    def get_queryset(self):
+        queryset = User.objects.filter(role__in=['instructor', 'admin'])
+        search = self.request.query_params.get('search', '')
+        if search:
+            queryset = queryset.filter(
+                models.Q(first_name__icontains=search)
+                | models.Q(last_name__icontains=search)
+                | models.Q(username__icontains=search)
+                | models.Q(email__icontains=search)
             )
         return queryset

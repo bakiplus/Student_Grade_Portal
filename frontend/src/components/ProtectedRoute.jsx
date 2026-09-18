@@ -6,7 +6,7 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 export default function ProtectedRoute({ children, role }) {
-  const { isAuthenticated, user, loading } = useAuth();
+  const { isAuthenticated, loading, isInstructor, isStudent } = useAuth();
 
   if (loading) {
     return (
@@ -18,17 +18,17 @@ export default function ProtectedRoute({ children, role }) {
   }
 
   if (!isAuthenticated) {
-    // Redirect instructors to /instructor/login, students to /login
+    // Redirect instructors/admins to /instructor/login, students to /login
     const loginPath = role === 'instructor' ? '/instructor/login' : '/login';
     return <Navigate to={loginPath} replace />;
   }
 
-  if (role && user?.role !== role) {
-    // Redirect to appropriate dashboard if role mismatches
-    const redirect = user?.role === 'instructor'
-      ? '/instructor/dashboard'
-      : '/student/dashboard';
-    return <Navigate to={redirect} replace />;
+  if (role === 'instructor' && !isInstructor) {
+    return <Navigate to="/student/dashboard" replace />;
+  }
+
+  if (role === 'student' && !isStudent) {
+    return <Navigate to="/instructor/dashboard" replace />;
   }
 
   return children;

@@ -39,7 +39,9 @@ class CourseListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'instructor':
+        if user.role in ('instructor', 'admin') or user.is_staff or user.is_superuser:
+            if user.is_superuser or user.role == 'admin':
+                return Course.objects.all()
             return Course.objects.filter(instructor=user)
         elif user.role == 'student':
             enrolled_course_ids = Enrollment.objects.filter(
@@ -71,7 +73,9 @@ class CourseDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        if user.role == 'instructor':
+        if user.role in ('instructor', 'admin') or user.is_staff or user.is_superuser:
+            if user.is_superuser or user.role == 'admin':
+                return Course.objects.all()
             return Course.objects.filter(instructor=user)
         elif user.role == 'student':
             enrolled_course_ids = Enrollment.objects.filter(
@@ -92,7 +96,10 @@ class EnrollStudentsView(APIView):
 
     def post(self, request, course_id):
         try:
-            course = Course.objects.get(id=course_id, instructor=request.user)
+            if request.user.is_superuser or request.user.role == 'admin':
+                course = Course.objects.get(id=course_id)
+            else:
+                course = Course.objects.get(id=course_id, instructor=request.user)
         except Course.DoesNotExist:
             return Response(
                 {'detail': 'Course not found or you are not the instructor.'},
@@ -138,6 +145,10 @@ class CourseStudentsView(generics.ListAPIView):
     permission_classes = [IsInstructor]
 
     def get_queryset(self):
+        if self.request.user.is_superuser or self.request.user.role == 'admin':
+            return Enrollment.objects.filter(
+                course_id=self.kwargs['course_id'],
+            ).select_related('student')
         return Enrollment.objects.filter(
             course_id=self.kwargs['course_id'],
             course__instructor=self.request.user,
@@ -153,11 +164,17 @@ class RemoveStudentView(APIView):
 
     def delete(self, request, course_id, student_id):
         try:
-            enrollment = Enrollment.objects.get(
-                course_id=course_id,
-                student_id=student_id,
-                course__instructor=request.user,
-            )
+            if request.user.is_superuser or request.user.role == 'admin':
+                enrollment = Enrollment.objects.get(
+                    course_id=course_id,
+                    student_id=student_id,
+                )
+            else:
+                enrollment = Enrollment.objects.get(
+                    course_id=course_id,
+                    student_id=student_id,
+                    course__instructor=request.user,
+                )
         except Enrollment.DoesNotExist:
             return Response(
                 {'detail': 'Enrollment not found.'},
@@ -179,6 +196,10 @@ class GradeComponentListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsInstructor]
 
     def get_queryset(self):
+        if self.request.user.is_superuser or self.request.user.role == 'admin':
+            return GradeComponent.objects.filter(
+                course_id=self.kwargs['course_id'],
+            )
         return GradeComponent.objects.filter(
             course_id=self.kwargs['course_id'],
             course__instructor=self.request.user,
@@ -186,10 +207,13 @@ class GradeComponentListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         try:
-            course = Course.objects.get(
-                id=self.kwargs['course_id'],
-                instructor=self.request.user,
-            )
+            if self.request.user.is_superuser or self.request.user.role == 'admin':
+                course = Course.objects.get(id=self.kwargs['course_id'])
+            else:
+                course = Course.objects.get(
+                    id=self.kwargs['course_id'],
+                    instructor=self.request.user,
+                )
         except Course.DoesNotExist:
             from rest_framework.exceptions import NotFound
             raise NotFound('Course not found.')
@@ -206,6 +230,8 @@ class GradeComponentDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsInstructor]
 
     def get_queryset(self):
+        if self.request.user.is_superuser or self.request.user.role == 'admin':
+            return GradeComponent.objects.all()
         return GradeComponent.objects.filter(
             course__instructor=self.request.user,
         )

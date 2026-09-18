@@ -80,7 +80,8 @@ export function AuthProvider({ children }) {
     loginInstructor,
     logout,
     isAuthenticated: !!user,
-    isInstructor: user?.role === 'instructor',
+    isInstructor: user?.role === 'instructor' || user?.role === 'admin' || !!user?.is_staff || !!user?.is_superuser,
+    isAdmin: user?.role === 'admin' || !!user?.is_staff || !!user?.is_superuser,
     isStudent: user?.role === 'student',
   };
 

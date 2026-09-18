@@ -89,8 +89,8 @@ class UserAdminAddForm(forms.ModelForm):
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     add_form = UserAdminAddForm
-    list_display = ['username', 'email', 'first_name', 'last_name', 'role', 'student_id', 'photo_url', 'is_active']
-    list_filter = ['role', 'is_active', 'is_staff']
+    list_display = ['username', 'email', 'first_name', 'last_name', 'role', 'student_id', 'is_staff', 'is_superuser', 'is_active']
+    list_filter = ['role', 'is_active', 'is_staff', 'is_superuser']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'student_id']
     ordering = ['last_name', 'first_name']
 

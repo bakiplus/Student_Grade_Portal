@@ -19,7 +19,7 @@ export default function Layout() {
   };
 
   const initials = user
-    ? `${user.first_name?.[0] || ''}${user.last_name?.[0] || ''}`.toUpperCase()
+    ? (((user.first_name?.[0] || '') + (user.last_name?.[0] || '')) || user.username?.[0] || '?').toUpperCase()
     : '?';
 
   const closeSidebar = () => setSidebarOpen(false);
@@ -88,9 +88,13 @@ export default function Layout() {
           <div className="user-info">
             <div className="user-avatar">{initials}</div>
             <div className="user-details">
-              <div className="user-name">{user?.first_name} {user?.last_name}</div>
+              <div className="user-name">
+                {(user?.first_name || user?.last_name)
+                  ? `${user?.first_name || ''} ${user?.last_name || ''}`.trim()
+                  : user?.username}
+              </div>
               <div className="user-role">
-                {user?.role}
+                {user?.role === 'admin' ? 'Administrator' : (user?.role || 'User')}
                 {user?.student_id && ` · ${user.student_id}`}
               </div>
             </div>

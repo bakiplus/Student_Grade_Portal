@@ -167,7 +167,7 @@ export default function LoginPage({ mode: initialMode = 'student' }) {
               className="btn btn-primary login-btn"
               disabled={loading}
             >
-              {loading ? 'Signing in...' : 'Sign In as Instructor →'}
+              {loading ? 'Signing in...' : 'Sign In as Faculty / Admin →'}
             </button>
 
             {/* Link to Student Portal */}

@@ -17,9 +17,10 @@ class User(AbstractUser):
     ROLE_CHOICES = [
         ('student', 'Student'),
         ('instructor', 'Instructor'),
+        ('admin', 'Admin'),
     ]
 
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
     student_id = models.CharField(
         max_length=20,
         unique=True,
@@ -50,7 +51,12 @@ class User(AbstractUser):
         return f"{self.get_full_name()} [{self.role}]"
 
     def save(self, *args, **kwargs):
-        """Auto-generate student_id for student accounts."""
+        """Auto-generate student_id for students, and assign 'admin' role for superusers/staff."""
+        if (self.is_superuser or self.is_staff) and (not self.role or self.role == 'student'):
+            self.role = 'admin'
+        elif not self.role:
+            self.role = 'student'
+
         if self.role == 'student' and not self.student_id:
             self.student_id = self._generate_student_id()
         elif self.role != 'student':
@@ -88,4 +94,8 @@ class User(AbstractUser):
 
     @property
     def is_instructor(self):
-        return self.role == 'instructor'
+        return self.role in ('instructor', 'admin') or self.is_staff or self.is_superuser
+
+    @property
+    def is_admin(self):
+        return self.role == 'admin' or self.is_staff or self.is_superuser

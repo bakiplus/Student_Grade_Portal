@@ -43,7 +43,10 @@ def calculate_course_results(course_id, instructor):
     - Not all students have all component scores
     """
     try:
-        course = Course.objects.get(id=course_id, instructor=instructor)
+        if getattr(instructor, 'is_superuser', False) or getattr(instructor, 'role', '') == 'admin':
+            course = Course.objects.get(id=course_id)
+        else:
+            course = Course.objects.get(id=course_id, instructor=instructor)
     except Course.DoesNotExist:
         raise ValueError("Course not found or you are not the instructor.")
 
@@ -136,7 +139,10 @@ def publish_course_results(course_id, instructor):
     Makes results visible to students.
     """
     try:
-        course = Course.objects.get(id=course_id, instructor=instructor)
+        if getattr(instructor, 'is_superuser', False) or getattr(instructor, 'role', '') == 'admin':
+            course = Course.objects.get(id=course_id)
+        else:
+            course = Course.objects.get(id=course_id, instructor=instructor)
     except Course.DoesNotExist:
         raise ValueError("Course not found or you are not the instructor.")
 

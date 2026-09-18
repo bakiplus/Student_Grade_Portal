@@ -17,21 +17,33 @@ class InstructorLoginSerializer(serializers.Serializer):
         username_input = data['username'].strip()
         password = data['password']
 
-        # Allow logging in with either username or email
+        # Allow logging in with either username or email (case-insensitive)
         if '@' in username_input:
             try:
                 user_obj = User.objects.get(email__iexact=username_input)
                 username_input = user_obj.username
             except (User.DoesNotExist, User.MultipleObjectsReturned):
                 pass
+        else:
+            try:
+                user_obj = User.objects.get(username__iexact=username_input)
+                username_input = user_obj.username
+            except (User.DoesNotExist, User.MultipleObjectsReturned):
+                pass
 
         user = authenticate(username=username_input, password=password)
         if not user:
-            raise serializers.ValidationError("Invalid instructor credentials.")
+            raise serializers.ValidationError("Invalid credentials. Please check your username/email and password.")
         if not user.is_active:
             raise serializers.ValidationError("This account is disabled.")
-        if user.role != 'instructor' and not user.is_staff:
+        if user.role not in ('instructor', 'admin') and not user.is_staff and not user.is_superuser:
             raise serializers.ValidationError("Access denied. This portal is for instructors and administrators.")
+
+        # Ensure role is set for superusers/staff if missing
+        if not user.role or user.role == 'student':
+            if user.is_superuser or user.is_staff:
+                user.role = 'admin'
+                user.save(update_fields=['role'])
 
         data['user'] = user
         return data
@@ -66,7 +78,7 @@ class LoginSerializer(serializers.Serializer):
     """
     Unified Login serializer supporting both:
     1. Student access via (student_id, first_name)
-    2. Instructor access via (username, password)
+    2. Instructor/Admin access via (username, password)
     """
     username = serializers.CharField(required=False, allow_blank=True)
     password = serializers.CharField(required=False, allow_blank=True, write_only=True)
@@ -100,9 +112,40 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name',
-            'role', 'student_id', 'photo_url', 'created_at',
+            'role', 'student_id', 'photo_url', 'is_staff', 'is_superuser', 'created_at',
         ]
         read_only_fields = fields
+
+
+class CreateInstructorSerializer(serializers.ModelSerializer):
+    """
+    Serializer for administrators to create instructor accounts with password.
+    """
+    first_name = serializers.CharField(required=True, max_length=150)
+    last_name = serializers.CharField(required=True, max_length=150)
+    username = serializers.CharField(required=True, max_length=150)
+    password = serializers.CharField(write_only=True, required=True, min_length=4)
+    email = serializers.EmailField(required=False, allow_blank=True)
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'email', 'first_name', 'last_name',
+            'password',
+        ]
+        read_only_fields = ['id']
+
+    def validate_username(self, value):
+        if value and User.objects.filter(username__iexact=value).exists():
+            raise serializers.ValidationError("A user with this username already exists.")
+        return value
+
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = User(**validated_data, role='instructor')
+        user.set_password(password)
+        user.save()
+        return user
 
 
 class CreateStudentSerializer(serializers.ModelSerializer):

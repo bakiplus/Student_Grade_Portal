@@ -14,6 +14,7 @@ urlpatterns = [
     path('me/', views.CurrentUserView.as_view(), name='auth-me'),
     # Cloudinary Upload
     path('upload-photo/', views.PhotoUploadView.as_view(), name='auth-upload-photo'),
-    # Student management
+    # Student & Instructor management
     path('students/', views.StudentListCreateView.as_view(), name='student-list-create'),
+    path('instructors/', views.InstructorListCreateView.as_view(), name='instructor-list-create'),
 ]
