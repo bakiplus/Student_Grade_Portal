@@ -22,25 +22,48 @@ print("=" * 60)
 print("  Seeding Student Grade Portal Database")
 print("=" * 60)
 
-# ─── Create Superadmin ────────────────────────────────────────────────────────
+# ─── Create Superadmins ────────────────────────────────────────────────────────
 
-admin_user, created = User.objects.get_or_create(
-    username='admin',
-    defaults={
+superadmins_data = [
+    {
+        'username': 'biruk',
+        'email': 'yoseftamrat923@gmail.com',
+        'first_name': 'Biruk',
+        'last_name': 'Tamrat',
+        'password': 'biruk123',
+    },
+    {
+        'username': 'Isaac',
+        'email': 'Issacbrown016@gmail.com',
+        'first_name': 'Isaac',
+        'last_name': 'Brown',
+        'password': 'biruk123',
+    },
+    {
+        'username': 'admin',
         'email': 'admin@gradeportal.com',
         'first_name': 'Admin',
         'last_name': 'User',
-        'role': 'instructor',
-        'is_staff': True,
-        'is_superuser': True,
-    }
-)
-if created:
-    admin_user.set_password('admin123')
+        'password': 'admin123',
+    },
+]
+
+for sdata in superadmins_data:
+    password = sdata.pop('password')
+    admin_user, _ = User.objects.get_or_create(
+        username=sdata['username'],
+        defaults={**sdata, 'role': 'admin', 'is_staff': True, 'is_superuser': True, 'is_active': True},
+    )
+    admin_user.role = 'admin'
+    admin_user.is_staff = True
+    admin_user.is_superuser = True
+    admin_user.is_active = True
+    admin_user.email = sdata['email']
+    admin_user.first_name = sdata['first_name']
+    admin_user.last_name = sdata['last_name']
+    admin_user.set_password(password)
     admin_user.save()
-    print("✓ Created superadmin: admin / admin123")
-else:
-    print("· Superadmin already exists")
+    print(f"✓ Verified Superadmin: {admin_user.username} ({admin_user.email}) / {password}")
 
 # ─── Create Instructors ──────────────────────────────────────────────────────
 
@@ -278,8 +301,11 @@ except Exception as e:
 print("\n" + "=" * 60)
 print("  Seed data complete!")
 print("=" * 60)
-print("\n--- Test Accounts ---")
+print("\n--- Superadmin & Admin Accounts ---")
+print(f"  Biruk:       biruk (or yoseftamrat923@gmail.com) / biruk123")
+print(f"  Isaac:       Isaac (or Issacbrown016@gmail.com) / biruk123")
 print(f"  Admin:       admin / admin123")
+print("\n--- Instructor Accounts ---")
 print(f"  Instructor:  dr.smith / instructor123")
 print(f"  Instructor:  dr.johnson / instructor123")
 print("\n--- Student Accounts (Student ID + First Name) ---")
