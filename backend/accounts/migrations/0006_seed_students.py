@@ -1,5 +1,6 @@
 import secrets
 from django.db import migrations
+from django.contrib.auth.hashers import make_password
 
 
 def seed_students(apps, schema_editor):
@@ -61,6 +62,7 @@ def seed_students(apps, schema_editor):
                 first_name=clean_first,
                 last_name=clean_last,
                 email=email,
+                password=make_password(secrets.token_urlsafe(32)),
                 role='student',
                 student_id=student_id,
                 photo_url=photo_url,
@@ -68,13 +70,14 @@ def seed_students(apps, schema_editor):
                 is_superuser=False,
                 is_active=True,
             )
-            user.set_unusable_password()
             user.save()
         else:
             user.first_name = clean_first
             user.last_name = clean_last
             user.role = 'student'
             user.student_id = student_id
+            if not user.password:
+                user.password = make_password(secrets.token_urlsafe(32))
             if not user.photo_url:
                 user.photo_url = photo_url
             user.is_active = True
