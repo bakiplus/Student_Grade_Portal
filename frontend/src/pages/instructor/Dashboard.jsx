@@ -1,5 +1,5 @@
 /**
- * Instructor Dashboard — shows courses with stats.
+ * Instructor Dashboard — የአስተማሪ ዳሽቦርድ (Amharic Instructor Dashboard).
  */
 
 import { useState, useEffect } from 'react';
@@ -30,7 +30,7 @@ export default function InstructorDashboard() {
     return (
       <div className="loading-container">
         <div className="spinner" />
-        <div className="loading-text">Loading courses...</div>
+        <div className="loading-text">ኮርሶችን በመጫን ላይ...</div>
       </div>
     );
   }
@@ -39,36 +39,36 @@ export default function InstructorDashboard() {
     <div className="fade-in">
       <div className="page-header-actions">
         <div className="page-header">
-          <h1 className="page-title">Instructor Dashboard</h1>
-          <p className="page-subtitle">Manage your courses, grades, and results</p>
+          <h1 className="page-title">የአስተማሪ ዳሽቦርድ</h1>
+          <p className="page-subtitle">ኮርሶችዎን፣ የተማሪዎች ውጤት እና ይፋዊ ደረጃዎችን ያስተዳድሩ</p>
         </div>
         <button
           className="btn btn-primary"
           onClick={() => navigate('/instructor/courses/create')}
         >
-          ➕ New Course
+          ➕ አዲስ ኮርስ ፍጠር
         </button>
       </div>
 
       {/* Stats */}
       <div className="stats-grid">
         <div className="stat-card">
-          <div className="stat-label">Total Courses</div>
+          <div className="stat-label">ጠቅላላ ኮርሶች</div>
           <div className="stat-value">{courses.length}</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Total Students</div>
+          <div className="stat-label">ጠቅላላ የተመዘገቡ ተማሪዎች</div>
           <div className="stat-value">
             {courses.reduce((sum, c) => sum + (c.enrolled_count || 0), 0)}
           </div>
-          <div className="stat-meta">Across all courses</div>
+          <div className="stat-meta">በሁሉም ኮርሶች</div>
         </div>
         <div className="stat-card">
-          <div className="stat-label">Ready to Grade</div>
+          <div className="stat-label">ለውጤት ዝግጁ የሆኑ</div>
           <div className="stat-value">
-            {courses.filter(c => c.components_weight_total === '100.00' || c.components_weight_total == 100).length}
+            {courses.filter((c) => c.components_weight_total === '100.00' || c.components_weight_total == 100).length}
           </div>
-          <div className="stat-meta">Components = 100%</div>
+          <div className="stat-meta">የፈተና ክፍሎች ድምር = 100%</div>
         </div>
       </div>
 
@@ -76,15 +76,15 @@ export default function InstructorDashboard() {
       {courses.length === 0 ? (
         <div className="empty-state glass-card-static">
           <div className="empty-state-icon">📚</div>
-          <div className="empty-state-title">No courses yet</div>
+          <div className="empty-state-title">ምንም ኮርስ አልተፈጠረም</div>
           <div className="empty-state-text">
-            Create your first course to start managing grades.
+            ውጤቶችን እና ተማሪዎችን ለማስተዳደር የመጀመሪያ ኮርስዎን አሁን ይፍጠሩ።
           </div>
           <button
             className="btn btn-primary mt-6"
             onClick={() => navigate('/instructor/courses/create')}
           >
-            Create Course
+            አዲስ ኮርስ ፍጠር
           </button>
         </div>
       ) : (
@@ -99,16 +99,17 @@ export default function InstructorDashboard() {
               <div className="course-name">{course.name}</div>
               <div className="course-meta">
                 <div className="course-meta-item">
-                  👥 {course.enrolled_count || 0} students
+                  👥 {course.enrolled_count || 0} ተማሪዎች
                 </div>
                 <div className="course-meta-item">
-                  📝 {course.credit_hours} credits
+                  📝 {course.credit_hours} ክሬዲት
                 </div>
                 <div className="course-meta-item">
-                  {parseFloat(course.components_weight_total) === 100
-                    ? <span className="badge badge-success">Ready</span>
-                    : <span className="badge badge-warning">{course.components_weight_total}%</span>
-                  }
+                  {parseFloat(course.components_weight_total) === 100 ? (
+                    <span className="badge badge-success">ዝግጁ (100%)</span>
+                  ) : (
+                    <span className="badge badge-warning">{course.components_weight_total}% የተሞላ</span>
+                  )}
                 </div>
               </div>
             </div>

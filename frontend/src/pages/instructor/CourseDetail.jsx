@@ -1,11 +1,12 @@
 /**
- * CourseDetail — tabbed view for managing a course.
- * Tabs: Students, Components, Grades, Results
+ * CourseDetail — የተማሪዎች፣ የፈተና ክፍሎች፣ የውጤት መዝገብ እና ይፋዊ ደረጃዎች ማስተዳደሪያ።
+ * Tabs: ተማሪዎች (Students), የፈተና ክፍሎች (Components), የውጤት መዝገብ (Grades), ይፋዊ ደረጃዎች (Results)
  */
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/client';
+import StudentAvatar from '../../components/StudentAvatar';
 
 export default function CourseDetail() {
   const { id } = useParams();
@@ -39,7 +40,7 @@ export default function CourseDetail() {
     return (
       <div className="loading-container">
         <div className="spinner" />
-        <div className="loading-text">Loading course...</div>
+        <div className="loading-text">የኮርስ መረጃዎችን በመጫን ላይ...</div>
       </div>
     );
   }
@@ -53,14 +54,14 @@ export default function CourseDetail() {
           </div>
           <h1 className="page-title">{course.name}</h1>
           <p className="page-subtitle">
-            {course.credit_hours} credit hours · {course.enrolled_count || 0} students
+            {course.credit_hours} የክሬዲት ሰዓት · {course.enrolled_count || 0} ተማሪዎች
           </p>
         </div>
         <button
           className="btn btn-secondary"
           onClick={() => navigate('/instructor/dashboard')}
         >
-          ← Back
+          ← ወደ ዳሽቦርድ ተመለስ
         </button>
       </div>
 
@@ -72,17 +73,18 @@ export default function CourseDetail() {
 
       {/* Tabs */}
       <div className="tabs">
-        {['students', 'components', 'grades', 'results'].map((tab) => (
+        {[
+          { key: 'students', label: '👥 ተማሪዎች' },
+          { key: 'components', label: '📋 የፈተና ክፍሎች' },
+          { key: 'grades', label: '✏️ የውጤት መዝገብ' },
+          { key: 'results', label: '📊 ይፋዊ ደረጃዎች' },
+        ].map((tab) => (
           <button
-            key={tab}
-            className={`tab ${activeTab === tab ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab)}
+            key={tab.key}
+            className={`tab ${activeTab === tab.key ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.key)}
           >
-            {tab === 'students' && '👥 '}
-            {tab === 'components' && '📋 '}
-            {tab === 'grades' && '✏️ '}
-            {tab === 'results' && '📊 '}
-            {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -106,7 +108,7 @@ export default function CourseDetail() {
 
 
 /* ═══════════════════════════════════════════════════════════
-   Students Tab
+   Students Tab — የተማሪዎች ዝርዝር እና ምዝገባ
    ═══════════════════════════════════════════════════════════ */
 
 function StudentsTab({ courseId, onMessage, onRefresh }) {
@@ -149,30 +151,30 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
       const res = await api.post(`/courses/${courseId}/enroll/`, {
         student_ids: selectedStudents,
       });
-      onMessage(`Enrolled ${res.data.enrolled.length} student(s).`);
+      onMessage(`${res.data.enrolled.length} ተማሪ(ዎች) በተሳካ ሁኔታ በኮርሱ ተመዝግበዋል!`);
       setShowEnrollModal(false);
       fetchStudents();
       onRefresh();
     } catch (err) {
-      onMessage(err.response?.data?.detail || 'Failed to enroll students.', 'error');
+      onMessage(err.response?.data?.detail || 'ተማሪዎችን መመዝገብ አልተቻለም።', 'error');
     }
   };
 
   const handleRemove = async (studentId) => {
-    if (!confirm('Remove this student from the course?')) return;
+    if (!confirm('ይህን ተማሪ ከዚህ ኮርስ ማስወገድ ይፈልጋሉ?')) return;
     try {
       await api.delete(`/courses/${courseId}/students/${studentId}/`);
-      onMessage('Student removed from course.');
+      onMessage('ተማሪው ከኮርሱ ተወግዷል።');
       fetchStudents();
       onRefresh();
     } catch (err) {
-      onMessage('Failed to remove student.', 'error');
+      onMessage('ተማሪውን ማስወገድ አልተቻለም።', 'error');
     }
   };
 
-  const enrolledIds = new Set(students.map(e => e.student_detail?.id || e.student));
-  const availableStudents = allStudents.filter(s => !enrolledIds.has(s.id));
-  const filteredAvailable = availableStudents.filter(s =>
+  const enrolledIds = new Set(students.map((e) => e.student_detail?.id || e.student));
+  const availableStudents = allStudents.filter((s) => !enrolledIds.has(s.id));
+  const filteredAvailable = availableStudents.filter((s) =>
     `${s.first_name} ${s.last_name} ${s.student_id} ${s.username}`
       .toLowerCase()
       .includes(search.toLowerCase())
@@ -186,19 +188,19 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h3 style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-          Enrolled Students ({students.length})
+          የተመዘገቡ ተማሪዎች ({students.length})
         </h3>
         <button className="btn btn-primary btn-sm" onClick={openEnrollModal}>
-          ➕ Enroll Students
+          ➕ ተማሪዎችን መዝግብ
         </button>
       </div>
 
       {students.length === 0 ? (
         <div className="empty-state glass-card-static">
           <div className="empty-state-icon">👥</div>
-          <div className="empty-state-title">No students enrolled</div>
+          <div className="empty-state-title">ምንም የተመዘገበ ተማሪ የለም</div>
           <div className="empty-state-text">
-            Enroll students to start managing grades.
+            ውጤቶችን ለማስተዳደር ተማሪዎችን በኮርሱ ይመዝግቡ።
           </div>
         </div>
       ) : (
@@ -206,11 +208,12 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
           <table>
             <thead>
               <tr>
-                <th>Student ID</th>
-                <th>Name</th>
-                <th>Username</th>
-                <th>Email</th>
-                <th>Actions</th>
+                <th>ፎቶ</th>
+                <th>የተማሪ መታወቂያ</th>
+                <th>ሙሉ ስም</th>
+                <th>የተጠቃሚ ስም</th>
+                <th>ኢሜይል</th>
+                <th>ድርጊቶች</th>
               </tr>
             </thead>
             <tbody>
@@ -218,18 +221,21 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
                 const s = enrollment.student_detail;
                 return (
                   <tr key={enrollment.id}>
+                    <td>
+                      <StudentAvatar student={s} size="sm" />
+                    </td>
                     <td><span className="badge badge-info">{s?.student_id}</span></td>
                     <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
                       {s?.first_name} {s?.last_name}
                     </td>
                     <td>{s?.username}</td>
-                    <td>{s?.email}</td>
+                    <td>{s?.email || '—'}</td>
                     <td>
                       <button
                         className="btn btn-danger btn-sm"
                         onClick={() => handleRemove(s?.id)}
                       >
-                        Remove
+                        አስወግድ
                       </button>
                     </td>
                   </tr>
@@ -245,19 +251,19 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
         <div className="modal-overlay" onClick={() => setShowEnrollModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <div className="modal-title">Enroll Students</div>
+              <div className="modal-title">ተማሪዎችን በኮርሱ መዝግብ</div>
               <button className="btn btn-ghost" onClick={() => setShowEnrollModal(false)}>✕</button>
             </div>
             <div className="modal-body">
               <input
                 className="form-input mb-4"
-                placeholder="Search students..."
+                placeholder="ተማሪዎችን በስም ወይም መታወቂያ ፈልግ..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
               {filteredAvailable.length === 0 ? (
                 <p className="text-muted" style={{ fontSize: 'var(--font-size-sm)' }}>
-                  No available students found.
+                  ምንም የሚመዘገብ ተማሪ አልተገኘም።
                 </p>
               ) : (
                 <div style={{ maxHeight: 300, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
@@ -280,11 +286,12 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
                           if (e.target.checked) {
                             setSelectedStudents([...selectedStudents, s.id]);
                           } else {
-                            setSelectedStudents(selectedStudents.filter(id => id !== s.id));
+                            setSelectedStudents(selectedStudents.filter((id) => id !== s.id));
                           }
                         }}
                         style={{ accentColor: 'var(--accent-primary)' }}
                       />
+                      <StudentAvatar student={s} size="sm" />
                       <div>
                         <div style={{ fontWeight: 500, fontSize: 'var(--font-size-sm)' }}>
                           {s.first_name} {s.last_name}
@@ -300,14 +307,14 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => setShowEnrollModal(false)}>
-                Cancel
+                ይቅር
               </button>
               <button
                 className="btn btn-primary"
                 onClick={handleEnroll}
                 disabled={selectedStudents.length === 0}
               >
-                Enroll ({selectedStudents.length})
+                መዝግብ ({selectedStudents.length})
               </button>
             </div>
           </div>
@@ -319,10 +326,10 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
 
 
 /* ═══════════════════════════════════════════════════════════
-   Components Tab
+   Components Tab — የፈተና ክፍሎች ማስተዳደሪያ
    ═══════════════════════════════════════════════════════════ */
 
-function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
+function ComponentsTab({ courseId, onMessage, onRefresh }) {
   const [components, setComponents] = useState([]);
   const [form, setForm] = useState({ name: '', max_score: '100', weight_percent: '', display_order: 0 });
   const [editing, setEditing] = useState(null);
@@ -348,10 +355,10 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
     try {
       if (editing) {
         await api.put(`/components/${editing}/`, { ...form, course: courseId });
-        onMessage('Component updated.');
+        onMessage('የፈተና ክፍሉ ተስተካክሏል።');
       } else {
         await api.post(`/courses/${courseId}/components/`, { ...form, course: courseId });
-        onMessage('Component added.');
+        onMessage('አዲስ የፈተና ክፍል ተጨምሯል።');
       }
       setForm({ name: '', max_score: '100', weight_percent: '', display_order: 0 });
       setEditing(null);
@@ -359,10 +366,11 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
       onRefresh();
     } catch (err) {
       const data = err.response?.data;
-      const msg = data?.non_field_errors?.[0]
-        || data?.detail
-        || Object.values(data || {}).flat().join(', ')
-        || 'Failed to save component.';
+      const msg =
+        data?.non_field_errors?.[0] ||
+        data?.detail ||
+        Object.values(data || {}).flat().join(', ') ||
+        'የፈተና ክፍሉን ማስቀመጥ አልተቻለም።';
       onMessage(msg, 'error');
     }
   };
@@ -378,14 +386,14 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
   };
 
   const handleDelete = async (compId) => {
-    if (!confirm('Delete this component?')) return;
+    if (!confirm('ይህን የፈተና ክፍል መሰረዝ ይፈልጋሉ?')) return;
     try {
       await api.delete(`/components/${compId}/`);
-      onMessage('Component deleted.');
+      onMessage('የፈተና ክፍሉ ተሰርዟል።');
       fetchComponents();
       onRefresh();
     } catch (err) {
-      onMessage('Failed to delete component.', 'error');
+      onMessage('የፈተና ክፍሉን መሰረዝ አልተቻለም።', 'error');
     }
   };
 
@@ -399,9 +407,16 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h3 style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-          Grade Components
-          <span style={{ fontWeight: 400, color: totalWeight === 100 ? 'var(--success)' : 'var(--warning)', marginLeft: 'var(--space-3)', fontSize: 'var(--font-size-sm)' }}>
-            (Total: {totalWeight}% / 100%)
+          የፈተና ክፍሎች
+          <span
+            style={{
+              fontWeight: 400,
+              color: totalWeight === 100 ? 'var(--success)' : 'var(--warning)',
+              marginLeft: 'var(--space-3)',
+              fontSize: 'var(--font-size-sm)',
+            }}
+          >
+            (አጠቃላይ፡ {totalWeight}% / 100%)
           </span>
         </h3>
       </div>
@@ -409,21 +424,21 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
       {/* Add/Edit Form */}
       <form onSubmit={handleSubmit} className="glass-card-static mb-6">
         <div style={{ marginBottom: 'var(--space-4)', fontWeight: 600, fontSize: 'var(--font-size-sm)' }}>
-          {editing ? 'Edit Component' : 'Add Component'}
+          {editing ? 'የፈተና ክፍል አስተካክል' : 'አዲስ የፈተና ክፍል ጨምር'}
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label className="form-label">Name *</label>
+            <label className="form-label">የክፍል ስም (Component Name) *</label>
             <input
               className="form-input"
-              placeholder="e.g., Midterm Exam"
+              placeholder="ለምሳሌ፡ Midterm Exam ወይም አጋማሽ ፈተና"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               required
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Max Score *</label>
+            <label className="form-label">ከፍተኛ ውጤት (Max Score) *</label>
             <input
               className="form-input"
               type="number"
@@ -435,7 +450,7 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Weight % *</label>
+            <label className="form-label">ክብደት % (Weight %) *</label>
             <input
               className="form-input"
               type="number"
@@ -449,7 +464,7 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Order</label>
+            <label className="form-label">ቅደም ተከተል (Order)</label>
             <input
               className="form-input"
               type="number"
@@ -461,7 +476,7 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
         </div>
         <div className="flex gap-3 mt-4">
           <button type="submit" className="btn btn-primary btn-sm">
-            {editing ? 'Update' : 'Add Component'}
+            {editing ? 'አሻሽል' : 'ክፍል ጨምር'}
           </button>
           {editing && (
             <button
@@ -472,7 +487,7 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
                 setForm({ name: '', max_score: '100', weight_percent: '', display_order: 0 });
               }}
             >
-              Cancel
+              ይቅር
             </button>
           )}
         </div>
@@ -484,11 +499,11 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
           <table>
             <thead>
               <tr>
-                <th>Order</th>
-                <th>Component</th>
-                <th>Max Score</th>
-                <th>Weight %</th>
-                <th>Actions</th>
+                <th>ቅደም ተከተል</th>
+                <th>የፈተና ክፍል</th>
+                <th>ከፍተኛ ውጤት</th>
+                <th>ክብደት %</th>
+                <th>ድርጊቶች</th>
               </tr>
             </thead>
             <tbody>
@@ -503,10 +518,10 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
                   <td>
                     <div className="flex gap-2">
                       <button className="btn btn-secondary btn-sm" onClick={() => handleEdit(comp)}>
-                        Edit
+                        አስተካክል
                       </button>
                       <button className="btn btn-danger btn-sm" onClick={() => handleDelete(comp.id)}>
-                        Delete
+                        ሰርዝ
                       </button>
                     </div>
                   </td>
@@ -522,7 +537,7 @@ function ComponentsTab({ courseId, course, onMessage, onRefresh }) {
 
 
 /* ═══════════════════════════════════════════════════════════
-   Grades Tab (Spreadsheet-like grade entry)
+   Grades Tab — የውጤት መመዝገቢያ ሰንጠረዥ
    ═══════════════════════════════════════════════════════════ */
 
 function GradesTab({ courseId, onMessage }) {
@@ -575,20 +590,20 @@ function GradesTab({ courseId, onMessage }) {
     });
 
     if (grades.length === 0) {
-      onMessage('No grades to save.', 'warning');
+      onMessage('የሚቀመጥ ምንም ውጤት የለም።', 'warning');
       setSaving(false);
       return;
     }
 
     try {
       const res = await api.post(`/courses/${courseId}/grades/`, { grades });
-      onMessage(`Saved ${res.data.saved} grade(s).`);
+      onMessage(`${res.data.saved} የፈተና ውጤት(ቶች) በተሳካ ሁኔታ ተመዝግቧል!`);
       if (res.data.errors?.length) {
-        onMessage(`Some errors: ${res.data.errors.join('; ')}`, 'warning');
+        onMessage(`አንዳንድ ስህተቶች አጋጥመዋል፡ ${res.data.errors.join('; ')}`, 'warning');
       }
       fetchGrades();
     } catch (err) {
-      onMessage(err.response?.data?.detail || 'Failed to save grades.', 'error');
+      onMessage(err.response?.data?.detail || 'ውጤቶችን መመዝገብ አልተቻለም።', 'error');
     } finally {
       setSaving(false);
     }
@@ -602,9 +617,9 @@ function GradesTab({ courseId, onMessage }) {
     return (
       <div className="empty-state glass-card-static">
         <div className="empty-state-icon">📋</div>
-        <div className="empty-state-title">No grade components defined</div>
+        <div className="empty-state-title">ምንም የፈተና ክፍል አልተዘጋጀም</div>
         <div className="empty-state-text">
-          Add grade components first before entering grades.
+          ውጤት ከማስገባትዎ በፊት መጀመሪያ የፈተና ክፍሎችን ያክሉ።
         </div>
       </div>
     );
@@ -614,9 +629,9 @@ function GradesTab({ courseId, onMessage }) {
     return (
       <div className="empty-state glass-card-static">
         <div className="empty-state-icon">👥</div>
-        <div className="empty-state-title">No students enrolled</div>
+        <div className="empty-state-title">ምንም የተመዘገበ ተማሪ የለም</div>
         <div className="empty-state-text">
-          Enroll students first before entering grades.
+          ውጤት ከማስገባትዎ በፊት መጀመሪያ ተማሪዎችን ይመዝግቡ።
         </div>
       </div>
     );
@@ -626,14 +641,14 @@ function GradesTab({ courseId, onMessage }) {
     <div>
       <div className="flex justify-between items-center mb-4">
         <h3 style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-          Grade Entry
+          የውጤት መመዝገቢያ
         </h3>
         <button
           className="btn btn-primary"
           onClick={handleSave}
           disabled={saving}
         >
-          {saving ? 'Saving...' : '💾 Save All Grades'}
+          {saving ? 'በመመዝገብ ላይ...' : '💾 ሁሉንም ውጤቶች መዝግብ'}
         </button>
       </div>
 
@@ -641,13 +656,14 @@ function GradesTab({ courseId, onMessage }) {
         <table>
           <thead>
             <tr>
-              <th>Student</th>
-              <th>ID</th>
+              <th>ፎቶ</th>
+              <th>ተማሪ</th>
+              <th>መታወቂያ</th>
               {gradesData.components.map((comp) => (
                 <th key={comp.id} style={{ textAlign: 'center' }}>
                   {comp.name}
                   <div style={{ fontWeight: 400, fontSize: '0.65rem', opacity: 0.7 }}>
-                    max: {comp.max_score} ({comp.weight_percent}%)
+                    ከፍተኛ፡ {comp.max_score} ({comp.weight_percent}%)
                   </div>
                 </th>
               ))}
@@ -656,6 +672,12 @@ function GradesTab({ courseId, onMessage }) {
           <tbody>
             {gradesData.students.map((student) => (
               <tr key={student.enrollment_id}>
+                <td>
+                  <StudentAvatar
+                    student={{ first_name: student.student_name, photo_url: student.photo_url }}
+                    size="sm"
+                  />
+                </td>
                 <td style={{ color: 'var(--text-primary)', fontWeight: 500, whiteSpace: 'nowrap' }}>
                   {student.student_name}
                 </td>
@@ -700,7 +722,7 @@ function GradesTab({ courseId, onMessage }) {
 
 
 /* ═══════════════════════════════════════════════════════════
-   Results Tab
+   Results Tab — ይፋዊ ውጤቶች እና ደረጃዎች
    ═══════════════════════════════════════════════════════════ */
 
 function ResultsTab({ courseId, onMessage }) {
@@ -728,24 +750,24 @@ function ResultsTab({ courseId, onMessage }) {
     setCalculating(true);
     try {
       const res = await api.post(`/courses/${courseId}/calculate/`);
-      onMessage(res.data.detail);
+      onMessage(res.data.detail || 'ውጤቶች እና ደረጃዎች በተሳካ ሁኔታ ተሰልተዋል!');
       fetchResults();
     } catch (err) {
-      onMessage(err.response?.data?.detail || 'Failed to calculate results.', 'error');
+      onMessage(err.response?.data?.detail || 'ውጤቶችን ማስላት አልተቻለም።', 'error');
     } finally {
       setCalculating(false);
     }
   };
 
   const handlePublish = async () => {
-    if (!confirm('Publish results? Students will be able to see their grades immediately.')) return;
+    if (!confirm('ውጤቱን ይፋ ማድረግ ይፈልጋሉ? ተማሪዎች ውጤታቸውን እና ደረጃቸውን ወዲያውኑ ማየት ይችላሉ።')) return;
     setPublishing(true);
     try {
       const res = await api.post(`/courses/${courseId}/publish/`);
-      onMessage(res.data.detail);
+      onMessage(res.data.detail || 'ውጤቶች ለተማሪዎች ይፋ ሆነዋል!');
       fetchResults();
     } catch (err) {
-      onMessage(err.response?.data?.detail || 'Failed to publish results.', 'error');
+      onMessage(err.response?.data?.detail || 'ውጤቶችን ይፋ ማድረግ አልተቻለም።', 'error');
     } finally {
       setPublishing(false);
     }
@@ -764,14 +786,14 @@ function ResultsTab({ courseId, onMessage }) {
   }
 
   const resultsList = results?.results || [];
-  const hasUnpublished = resultsList.some(r => !r.is_published);
+  const hasUnpublished = resultsList.some((r) => !r.is_published);
   const hasResults = resultsList.length > 0;
 
   return (
     <div>
       <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
         <h3 style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
-          Results {hasResults && `(${resultsList.length} students)`}
+          ይፋዊ ደረጃዎች እና ውጤቶች {hasResults && `(${resultsList.length} ተማሪዎች)`}
         </h3>
         <div className="flex gap-3">
           <button
@@ -779,7 +801,7 @@ function ResultsTab({ courseId, onMessage }) {
             onClick={handleCalculate}
             disabled={calculating}
           >
-            {calculating ? 'Calculating...' : '🔄 Calculate Results'}
+            {calculating ? 'በማስላት ላይ...' : '🔄 ውጤቶችን አስላ'}
           </button>
           {hasUnpublished && (
             <button
@@ -787,7 +809,7 @@ function ResultsTab({ courseId, onMessage }) {
               onClick={handlePublish}
               disabled={publishing}
             >
-              {publishing ? 'Publishing...' : '📢 Publish Results'}
+              {publishing ? 'ይፋ በማድረግ ላይ...' : '📢 ይፋ አድርግ (Publish)'}
             </button>
           )}
         </div>
@@ -796,9 +818,9 @@ function ResultsTab({ courseId, onMessage }) {
       {!hasResults ? (
         <div className="empty-state glass-card-static">
           <div className="empty-state-icon">📊</div>
-          <div className="empty-state-title">No results calculated yet</div>
+          <div className="empty-state-title">እስካሁን የተሰላ ውጤት የለም</div>
           <div className="empty-state-text">
-            Enter all grades first, then click "Calculate Results" to compute final scores, letter grades, and rankings.
+            መጀመሪያ ሁሉንም ውጤቶች ያስገቡ፣ ከዚያም አጠቃላይ ውጤት እና ደረጃ ለማስላት "ውጤቶችን አስላ" የሚለውን ይጫኑ።
           </div>
         </div>
       ) : (
@@ -806,26 +828,39 @@ function ResultsTab({ courseId, onMessage }) {
           <table>
             <thead>
               <tr>
-                <th>Rank</th>
-                <th>Student</th>
-                <th>Student ID</th>
-                <th>Total Score</th>
-                <th>Grade</th>
-                <th>Status</th>
-                <th>Published</th>
+                <th>ደረጃ (Rank)</th>
+                <th>ፎቶ</th>
+                <th>ተማሪ</th>
+                <th>የተማሪ መታወቂያ</th>
+                <th>ጠቅላላ ውጤት</th>
+                <th>የውጤት ፊደል</th>
+                <th>ሁኔታ</th>
+                <th>ይፋዊነት</th>
               </tr>
             </thead>
             <tbody>
               {resultsList.map((result) => (
                 <tr key={result.id}>
                   <td>
-                    <span style={{
-                      fontWeight: 700,
-                      color: result.rank <= 3 ? 'var(--accent-primary-hover)' : 'var(--text-secondary)',
-                      fontSize: result.rank <= 3 ? 'var(--font-size-base)' : 'var(--font-size-sm)',
-                    }}>
+                    <span
+                      style={{
+                        fontWeight: 700,
+                        color: result.rank <= 3 ? 'var(--accent-primary-hover)' : 'var(--text-secondary)',
+                        fontSize: result.rank <= 3 ? 'var(--font-size-base)' : 'var(--font-size-sm)',
+                      }}
+                    >
+                      {result.rank === 1 && '🥇 '}
+                      {result.rank === 2 && '🥈 '}
+                      {result.rank === 3 && '🥉 '}
                       #{result.rank}
                     </span>
+                  </td>
+                  <td>
+                    <StudentAvatar
+                      photoUrl={result.student_photo_url}
+                      name={result.student_name}
+                      size="sm"
+                    />
                   </td>
                   <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
                     {result.student_name}
@@ -839,19 +874,22 @@ function ResultsTab({ courseId, onMessage }) {
                   <td>
                     <span
                       className="badge badge-grade"
-                      style={{ color: getGradeColor(result.letter_grade), background: `${getGradeColor(result.letter_grade)}20` }}
+                      style={{
+                        color: getGradeColor(result.letter_grade),
+                        background: `${getGradeColor(result.letter_grade)}20`,
+                      }}
                     >
                       {result.letter_grade}
                     </span>
                   </td>
                   <td>
                     <span className={`badge ${result.passed ? 'badge-success' : 'badge-error'}`}>
-                      {result.passed ? 'PASS' : 'FAIL'}
+                      {result.passed ? '✅ አልፏል' : '❌ ወድቋል'}
                     </span>
                   </td>
                   <td>
                     <span className={`badge ${result.is_published ? 'badge-success' : 'badge-warning'}`}>
-                      {result.is_published ? 'Published' : 'Draft'}
+                      {result.is_published ? '📢 ይፋ ሆኗል' : '📝 ረቂቅ'}
                     </span>
                   </td>
                 </tr>

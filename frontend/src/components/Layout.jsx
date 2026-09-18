@@ -1,11 +1,11 @@
 /**
- * Layout component with sidebar navigation.
- * Renders different nav items based on user role.
+ * Layout component with Amharic sidebar navigation.
  */
 
 import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import StudentAvatar from './StudentAvatar';
 
 export default function Layout() {
   const { user, logout, isInstructor } = useAuth();
@@ -18,11 +18,13 @@ export default function Layout() {
     navigate(wasInstructor ? '/instructor/login' : '/login');
   };
 
-  const initials = user
-    ? (((user.first_name?.[0] || '') + (user.last_name?.[0] || '')) || user.username?.[0] || '?').toUpperCase()
-    : '?';
-
   const closeSidebar = () => setSidebarOpen(false);
+
+  const getRoleLabel = () => {
+    if (user?.role === 'admin' || user?.is_superuser) return 'ዋና አስተዳዳሪ (Admin)';
+    if (user?.role === 'instructor' || user?.is_staff) return 'አስተማሪ (Instructor)';
+    return 'ተማሪ (Student)';
+  };
 
   return (
     <div className="app-layout">
@@ -30,7 +32,7 @@ export default function Layout() {
       <button
         className="mobile-menu-toggle"
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        aria-label="Toggle menu"
+        aria-label="ምናሌ ክፈት"
       >
         {sidebarOpen ? '✕' : '☰'}
       </button>
@@ -38,8 +40,8 @@ export default function Layout() {
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <div className="sidebar-logo">GradePortal</div>
-          <div className="sidebar-subtitle">Student Grade Management</div>
+          <div className="sidebar-logo">የውጤት ፖርታል</div>
+          <div className="sidebar-subtitle">Student Grade Portal</div>
         </div>
 
         <nav className="sidebar-nav">
@@ -51,7 +53,7 @@ export default function Layout() {
                 onClick={closeSidebar}
               >
                 <span className="nav-icon">📊</span>
-                Dashboard
+                ዳሽቦርድ (Dashboard)
               </NavLink>
               <NavLink
                 to="/instructor/courses/create"
@@ -59,7 +61,7 @@ export default function Layout() {
                 onClick={closeSidebar}
               >
                 <span className="nav-icon">➕</span>
-                Create Course
+                አዲስ ኮርስ ፍጠር
               </NavLink>
               <NavLink
                 to="/instructor/students"
@@ -67,7 +69,7 @@ export default function Layout() {
                 onClick={closeSidebar}
               >
                 <span className="nav-icon">👥</span>
-                Manage Students
+                ተማሪዎችን አስተዳድር
               </NavLink>
             </>
           ) : (
@@ -78,7 +80,7 @@ export default function Layout() {
                 onClick={closeSidebar}
               >
                 <span className="nav-icon">📚</span>
-                My Courses
+                የእኔ ኮርሶች እና ውጤቶች
               </NavLink>
             </>
           )}
@@ -86,21 +88,21 @@ export default function Layout() {
 
         <div className="sidebar-footer">
           <div className="user-info">
-            <div className="user-avatar">{initials}</div>
+            <StudentAvatar student={user} size="md" />
             <div className="user-details">
               <div className="user-name">
-                {(user?.first_name || user?.last_name)
+                {user?.first_name || user?.last_name
                   ? `${user?.first_name || ''} ${user?.last_name || ''}`.trim()
                   : user?.username}
               </div>
               <div className="user-role">
-                {user?.role === 'admin' ? 'Administrator' : (user?.role || 'User')}
+                {getRoleLabel()}
                 {user?.student_id && ` · ${user.student_id}`}
               </div>
             </div>
           </div>
           <button className="btn btn-ghost w-full mt-2" onClick={handleLogout}>
-            🚪 Logout
+            🚪 ውጣ (Logout)
           </button>
         </div>
       </aside>

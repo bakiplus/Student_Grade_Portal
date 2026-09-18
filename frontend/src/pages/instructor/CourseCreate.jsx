@@ -1,5 +1,5 @@
 /**
- * CourseCreate — form for creating a new course.
+ * CourseCreate — አዲስ ኮርስ መመዝገቢያ ቅጽ (Amharic Course Creation Form).
  */
 
 import { useState } from 'react';
@@ -37,7 +37,7 @@ export default function CourseCreate() {
           .join('\n');
         setError(messages);
       } else {
-        setError('Failed to create course.');
+        setError('ኮርስ መፍጠር አልተቻለም።');
       }
     } finally {
       setLoading(false);
@@ -47,8 +47,8 @@ export default function CourseCreate() {
   return (
     <div className="fade-in">
       <div className="page-header">
-        <h1 className="page-title">Create New Course</h1>
-        <p className="page-subtitle">Set up a new course for your students</p>
+        <h1 className="page-title">አዲስ ኮርስ ፍጠር</h1>
+        <p className="page-subtitle">ለተማሪዎችዎ አዲስ ኮርስ ያዘጋጁ እና ያስተዳድሩ</p>
       </div>
 
       <div className="glass-card-static" style={{ maxWidth: 600 }}>
@@ -62,19 +62,19 @@ export default function CourseCreate() {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-5)' }}>
           <div className="form-row">
             <div className="form-group">
-              <label className="form-label" htmlFor="code">Course Code *</label>
+              <label className="form-label" htmlFor="code">የኮርስ ኮድ (Course Code) *</label>
               <input
                 id="code"
                 name="code"
                 className="form-input"
-                placeholder="e.g., CS101"
+                placeholder="ለምሳሌ፡ CS101 ወይም MATH201"
                 value={form.code}
                 onChange={handleChange}
                 required
               />
             </div>
             <div className="form-group">
-              <label className="form-label" htmlFor="credit_hours">Credit Hours *</label>
+              <label className="form-label" htmlFor="credit_hours">ክሬዲት ሰዓት (Credit Hours) *</label>
               <input
                 id="credit_hours"
                 name="credit_hours"
@@ -90,12 +90,12 @@ export default function CourseCreate() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="name">Course Name *</label>
+            <label className="form-label" htmlFor="name">የኮርስ ስም (Course Name) *</label>
             <input
               id="name"
               name="name"
               className="form-input"
-              placeholder="e.g., Introduction to Computer Science"
+              placeholder="ለምሳሌ፡ Introduction to Computer Science"
               value={form.name}
               onChange={handleChange}
               required
@@ -103,12 +103,12 @@ export default function CourseCreate() {
           </div>
 
           <div className="form-group">
-            <label className="form-label" htmlFor="description">Description</label>
+            <label className="form-label" htmlFor="description">የኮርስ መግለጫ (Description)</label>
             <textarea
               id="description"
               name="description"
               className="form-textarea"
-              placeholder="Course description (optional)"
+              placeholder="የኮርሱ ዝርዝር መግለጫ (አማራጭ)"
               value={form.description}
               onChange={handleChange}
             />
@@ -116,14 +116,14 @@ export default function CourseCreate() {
 
           <div className="flex gap-3">
             <button type="submit" className="btn btn-primary" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Course'}
+              {loading ? 'በመፍጠር ላይ...' : 'ኮርስ ፍጠር'}
             </button>
             <button
               type="button"
               className="btn btn-secondary"
               onClick={() => navigate('/instructor/dashboard')}
             >
-              Cancel
+              ይቅር
             </button>
           </div>
         </form>

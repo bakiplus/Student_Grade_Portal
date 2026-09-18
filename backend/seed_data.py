@@ -143,8 +143,6 @@ for index, (first_name, last_name) in enumerate(students_raw, start=1):
     clean_last_user = clean_last.lower().replace(' ', '')
     username = f"{clean_first_user}.{clean_last_user}"
     email = f"{clean_first_user}.{clean_last_user}@student.com"
-    seed_name = f"{clean_first}{clean_last.replace(' ', '')}"
-    photo_url = f"https://api.dicebear.com/7.x/avataaars/svg?seed={seed_name}"
     student_id = f"STU-26{index:04d}"
 
     students_data.append({
@@ -152,7 +150,7 @@ for index, (first_name, last_name) in enumerate(students_raw, start=1):
         'email': email,
         'first_name': clean_first,
         'last_name': clean_last,
-        'photo_url': photo_url,
+        'photo_url': '',
         'student_id': student_id,
     })
 

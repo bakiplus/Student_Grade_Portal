@@ -1,9 +1,11 @@
 /**
- * ManageStudents — for instructors to register, view, search, and upload/manage student photos with optional state.
+ * ManageStudents — የተማሪዎች አስተዳደር እና የፎቶ ማስተካከያ (Amharic Manage Students).
+ * Full support for optional student photos with blank state and Cloudinary uploads.
  */
 
 import { useState } from 'react';
 import api from '../../api/client';
+import StudentAvatar from '../../components/StudentAvatar';
 
 export default function ManageStudents() {
   const [students, setStudents] = useState([]);
@@ -11,7 +13,7 @@ export default function ManageStudents() {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
+
   // Modals state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
@@ -74,7 +76,7 @@ export default function ManageStudents() {
         }
       }
     } catch (err) {
-      setError(err.response?.data?.detail || 'Failed to upload photo to Cloudinary.');
+      setError(err.response?.data?.detail || 'ፎቶውን መጫን አልተቻለም። እባክዎ እንደገና ይሞክሩ።');
     } finally {
       setUploadingPhoto(false);
     }
@@ -85,10 +87,11 @@ export default function ManageStudents() {
     setError('');
     setSuccess('');
     setEditingStudent(student);
+    const existingPhoto = (student.photo_url && !student.photo_url.includes('dicebear')) ? student.photo_url : '';
     setEditForm({
       first_name: student.first_name || '',
       last_name: student.last_name || '',
-      photo_url: student.photo_url || '',
+      photo_url: existingPhoto,
       email: student.email || '',
     });
   };
@@ -109,7 +112,7 @@ export default function ManageStudents() {
       setStudents((prev) =>
         prev.map((s) => (s.id === editingStudent.id ? updatedStudent : s))
       );
-      setSuccess(`Updated photo & profile for ${updatedStudent.first_name} ${updatedStudent.last_name}!`);
+      setSuccess(`ለተማሪ ${updatedStudent.first_name} ${updatedStudent.last_name} ፎቶ እና መረጃ በተሳካ ሁኔታ ተስተካክሏል!`);
       setTimeout(() => {
         setEditingStudent(null);
         setSuccess('');
@@ -122,7 +125,7 @@ export default function ManageStudents() {
           .join('\n');
         setError(messages);
       } else {
-        setError('Failed to update student photo.');
+        setError('የተማሪውን መረጃ ማስተካከል አልተቻለም።');
       }
     } finally {
       setSavingEdit(false);
@@ -138,7 +141,7 @@ export default function ManageStudents() {
     try {
       const res = await api.post('/auth/students/', createForm);
       setSuccess(
-        `Student created successfully! Student ID: ${res.data.student_id} | Login Key: First Name "${res.data.first_name}".`
+        `ተማሪው በተሳካ ሁኔታ ተመዝግቧል! መታወቂያ፡ ${res.data.student_id} | የመግቢያ ቁልፍ፡ "${res.data.first_name}"`
       );
       setCreateForm({ first_name: '', last_name: '', photo_url: '', username: '', email: '' });
       fetchStudents();
@@ -154,7 +157,7 @@ export default function ManageStudents() {
           .join('\n');
         setError(messages);
       } else {
-        setError('Failed to create student.');
+        setError('ተማሪውን መመዝገብ አልተቻለም።');
       }
     }
   };
@@ -174,9 +177,9 @@ export default function ManageStudents() {
     <div className="fade-in">
       <div className="page-header-actions">
         <div className="page-header">
-          <h1 className="page-title">Manage Students</h1>
+          <h1 className="page-title">ተማሪዎችን አስተዳድር</h1>
           <p className="page-subtitle">
-            Upload & manage optional student photos, view student IDs, and maintain passwordless student records ({students.length} Total)
+            የተማሪዎች ዝርዝር፣ የተማሪ መታወቂያ እና ፎቶዎች (ፎቶ አማራጭ ነው) — ጠቅላላ {students.length} ተማሪዎች
           </p>
         </div>
         <div style={{ display: 'flex', gap: 'var(--space-3)' }}>
@@ -188,7 +191,7 @@ export default function ManageStudents() {
               setShowCreateModal(true);
             }}
           >
-            ➕ Register New Student
+            ➕ አዲስ ተማሪ መዝግብ
           </button>
         </div>
       </div>
@@ -199,7 +202,7 @@ export default function ManageStudents() {
           <input
             className="form-input"
             type="text"
-            placeholder="🔍 Search students by name, Student ID (e.g. STU-260001), or username..."
+            placeholder="🔍 ተማሪዎችን በስም፣ በመታወቂያ ቁጥር (ለምሳሌ፡ STU-260001) ወይም በተጠቃሚ ስም ይፈልጉ..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ paddingLeft: '2.5rem' }}
@@ -210,7 +213,7 @@ export default function ManageStudents() {
         </div>
         {searchQuery && (
           <button className="btn btn-secondary" onClick={() => setSearchQuery('')} style={{ fontSize: 'var(--font-size-xs)' }}>
-            Clear Search
+            ፍለጋውን አጽዳ
           </button>
         )}
       </div>
@@ -223,12 +226,12 @@ export default function ManageStudents() {
         <div className="empty-state glass-card-static">
           <div className="empty-state-icon">👥</div>
           <div className="empty-state-title">
-            {students.length === 0 ? 'No students yet' : 'No students matching search'}
+            {students.length === 0 ? 'ምንም ተማሪ አልተመዘገበም' : 'በፍለጋው የተገኘ ተማሪ የለም'}
           </div>
           <div className="empty-state-text">
             {students.length === 0
-              ? 'Register students to assign courses and enter grades.'
-              : `No results found for "${searchQuery}". Try a different name or ID.`}
+              ? 'ኮርሶችን ለመመደብ እና ውጤት ለማስገባት ተማሪዎችን ይመዝግቡ።'
+              : `ለ "${searchQuery}" ምንም ውጤት አልተገኘም። እባክዎ ሌላ ስም ወይም መታወቂያ ይሞክሩ።`}
           </div>
         </div>
       ) : (
@@ -236,45 +239,27 @@ export default function ManageStudents() {
           <table>
             <thead>
               <tr>
-                <th style={{ width: '64px' }}>Photo</th>
-                <th>Student ID</th>
-                <th>Full Name</th>
-                <th>Login First Name</th>
-                <th>Photo Status</th>
-                <th>Username</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th style={{ width: '64px' }}>ፎቶ</th>
+                <th>የተማሪ መታወቂያ</th>
+                <th>ሙሉ ስም</th>
+                <th>የመግቢያ ስም</th>
+                <th>የፎቶ ሁኔታ</th>
+                <th>የተጠቃሚ ስም</th>
+                <th style={{ textAlign: 'right' }}>እርምጃዎች</th>
               </tr>
             </thead>
             <tbody>
               {filteredStudents.map((s) => {
                 const hasCustomPhoto = Boolean(s.photo_url && !s.photo_url.includes('dicebear'));
-                const photoSrc =
-                  s.photo_url ||
-                  `https://api.dicebear.com/7.x/avataaars/svg?seed=${s.first_name}${s.last_name}`;
 
                 return (
                   <tr key={s.id}>
                     <td>
-                      <div
+                      <StudentAvatar
+                        student={s}
+                        size="md"
                         onClick={() => openEditModal(s)}
-                        title="Click to change photo"
-                        style={{ cursor: 'pointer', position: 'relative', display: 'inline-block' }}
-                      >
-                        <img
-                          src={photoSrc}
-                          alt={s.first_name}
-                          className="student-table-avatar"
-                          style={{
-                            border: hasCustomPhoto ? '2px solid var(--accent-primary)' : '2px dashed var(--border-subtle)',
-                            transition: 'transform 0.2s ease',
-                          }}
-                          onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.1)')}
-                          onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1.0)')}
-                          onError={(e) => {
-                            e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${s.first_name}`;
-                          }}
-                        />
-                      </div>
+                      />
                     </td>
                     <td>
                       <span className="badge badge-info">{s.student_id}</span>
@@ -290,11 +275,11 @@ export default function ManageStudents() {
                     <td>
                       {hasCustomPhoto ? (
                         <span className="badge badge-primary" style={{ fontSize: '11px' }}>
-                          📷 Custom Photo
+                          📷 ፎቶ አለው
                         </span>
                       ) : (
                         <span className="badge badge-secondary" style={{ fontSize: '11px', opacity: 0.8 }}>
-                          🎭 Avatar (Optional)
+                          ⚪ ፎቶ የለውም (ባዶ)
                         </span>
                       )}
                     </td>
@@ -305,7 +290,7 @@ export default function ManageStudents() {
                         onClick={() => openEditModal(s)}
                         style={{ fontSize: 'var(--font-size-xs)', padding: '4px 10px' }}
                       >
-                        📸 {hasCustomPhoto ? 'Change Photo' : 'Upload Photo'}
+                        📸 {hasCustomPhoto ? 'ፎቶ ቀይር' : 'ፎቶ ጫን'}
                       </button>
                     </td>
                   </tr>
@@ -322,7 +307,7 @@ export default function ManageStudents() {
           <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '520px' }}>
             <div className="modal-header">
               <div className="modal-title">
-                📸 Student Photo & Profile — {editingStudent.first_name} {editingStudent.last_name}
+                📸 የተማሪ ፎቶ እና መረጃ — {editingStudent.first_name} {editingStudent.last_name}
               </div>
               <button className="btn btn-ghost" onClick={() => setEditingStudent(null)}>
                 ✕
@@ -350,36 +335,18 @@ export default function ManageStudents() {
                     padding: 'var(--space-4)',
                   }}
                 >
-                  <div
-                    style={{
-                      width: '110px',
-                      height: '110px',
-                      borderRadius: '50%',
-                      overflow: 'hidden',
-                      border: editForm.photo_url ? '3px solid var(--accent-primary)' : '3px dashed var(--border-subtle)',
-                      boxShadow: 'var(--shadow-md)',
-                      position: 'relative',
-                    }}
-                  >
-                    <img
-                      src={
-                        editForm.photo_url ||
-                        `https://api.dicebear.com/7.x/avataaars/svg?seed=${editForm.first_name}${editForm.last_name}`
-                      }
-                      alt="Student Preview"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={(e) => {
-                        e.target.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${editForm.first_name}`;
-                      }}
-                    />
-                  </div>
+                  <StudentAvatar
+                    photoUrl={editForm.photo_url}
+                    name={`${editForm.first_name} ${editForm.last_name}`}
+                    size="xl"
+                  />
 
                   <div style={{ textAlign: 'center' }}>
                     <div style={{ fontSize: 'var(--font-size-sm)', fontWeight: 600, color: 'var(--text-primary)' }}>
                       {editForm.first_name} {editForm.last_name}
                     </div>
                     <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>
-                      ID: <span className="badge badge-info">{editingStudent.student_id}</span> • Login Key:{' '}
+                      መታወቂያ፡ <span className="badge badge-info">{editingStudent.student_id}</span> • የመግቢያ ቁልፍ፡{' '}
                       <span className="badge badge-success">{editForm.first_name}</span>
                     </div>
                   </div>
@@ -387,7 +354,7 @@ export default function ManageStudents() {
                   {/* Photo Actions */}
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2)', justifyContent: 'center', width: '100%' }}>
                     <label className="btn btn-primary" style={{ cursor: 'pointer', fontSize: 'var(--font-size-xs)' }}>
-                      {uploadingPhoto ? '⏳ Uploading...' : '📁 Upload Photo (Cloudinary)'}
+                      {uploadingPhoto ? '⏳ በመጫን ላይ...' : '📁 ፎቶ ይጫኑ (Upload Photo)'}
                       <input
                         type="file"
                         accept="image/*"
@@ -404,7 +371,7 @@ export default function ManageStudents() {
                         onClick={() => setEditForm((prev) => ({ ...prev, photo_url: '' }))}
                         style={{ fontSize: 'var(--font-size-xs)', color: 'var(--danger, #ef4444)' }}
                       >
-                        🗑️ Reset to Default Avatar
+                        🗑️ ፎቶውን አስወግድ (ባዶ ይሁን)
                       </button>
                     )}
                   </div>
@@ -413,13 +380,13 @@ export default function ManageStudents() {
                   <div style={{ width: '100%' }}>
                     <input
                       className="form-input"
-                      placeholder="Or paste image URL (Cloudinary / CDN)"
+                      placeholder="ወይም የፎቶ ሊንክ ያስገቡ (አማራጭ)"
                       value={editForm.photo_url}
                       onChange={(e) => setEditForm((prev) => ({ ...prev, photo_url: e.target.value }))}
                       style={{ fontSize: 'var(--font-size-xs)' }}
                     />
                     <span style={{ fontSize: '11px', color: 'var(--text-muted)', display: 'block', marginTop: '4px', textAlign: 'center' }}>
-                      💡 Photo is <strong>optional</strong>. If left blank, a generated avatar is used automatically.
+                      💡 ፎቶ መጫን <strong>አማራጭ</strong> ነው። ካልተጫነ ባዶ ሆኖ ይቆያል።
                     </span>
                   </div>
                 </div>
@@ -427,7 +394,7 @@ export default function ManageStudents() {
                 {/* Edit Names & Email */}
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">First Name (Student's Login Key)</label>
+                    <label className="form-label">የመጀመሪያ ስም (የመግቢያ ቁልፍ) *</label>
                     <input
                       className="form-input"
                       value={editForm.first_name}
@@ -436,7 +403,7 @@ export default function ManageStudents() {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Last Name</label>
+                    <label className="form-label">የአባት ስም *</label>
                     <input
                       className="form-input"
                       value={editForm.last_name}
@@ -447,7 +414,7 @@ export default function ManageStudents() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Email (Optional)</label>
+                  <label className="form-label">ኢሜይል (አማራጭ)</label>
                   <input
                     className="form-input"
                     type="email"
@@ -460,10 +427,10 @@ export default function ManageStudents() {
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setEditingStudent(null)}>
-                  Cancel
+                  ይቅር
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={uploadingPhoto || savingEdit}>
-                  {savingEdit ? 'Saving...' : '💾 Save Photo & Details'}
+                  {savingEdit ? 'በማስቀመጥ ላይ...' : '💾 ለውጦችን አስቀምጥ'}
                 </button>
               </div>
             </form>
@@ -476,7 +443,7 @@ export default function ManageStudents() {
         <div className="modal-overlay" onClick={() => setShowCreateModal(false)}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
-              <div className="modal-title">Register New Student</div>
+              <div className="modal-title">አዲስ ተማሪ መመዝገቢያ</div>
               <button className="btn btn-ghost" onClick={() => setShowCreateModal(false)}>
                 ✕
               </button>
@@ -493,8 +460,7 @@ export default function ManageStudents() {
                     color: 'var(--text-secondary)',
                   }}
                 >
-                  💡 <strong>Passwordless Flow:</strong> Students log in using their auto-generated{' '}
-                  <strong>Student ID</strong> and their <strong>First Name</strong>.
+                  💡 <strong>የይለፍ ቃል አልባ ምዝገባ፡</strong> ተማሪዎች በራስ-ሰር በሚመነጨው <strong>የተማሪ መታወቂያ</strong> እና <strong>በመጀመሪያ ስማቸው</strong> ይገባሉ።
                 </div>
 
                 {error && (
@@ -507,25 +473,18 @@ export default function ManageStudents() {
                 {/* Photo Upload / Preview Section */}
                 <div className="form-group">
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <label className="form-label" style={{ margin: 0 }}>Student Photo</label>
-                    <span className="badge badge-secondary" style={{ fontSize: '11px' }}>Optional</span>
+                    <label className="form-label" style={{ margin: 0 }}>የተማሪ ፎቶ</label>
+                    <span className="badge badge-secondary" style={{ fontSize: '11px' }}>አማራጭ (Optional)</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-4)' }}>
-                    <div className="photo-preview-circle">
-                      <img
-                        src={
-                          createForm.photo_url ||
-                          (createForm.first_name
-                            ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${createForm.first_name}`
-                            : 'https://api.dicebear.com/7.x/avataaars/svg?seed=new')
-                        }
-                        alt="Preview"
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      />
-                    </div>
+                    <StudentAvatar
+                      photoUrl={createForm.photo_url}
+                      name={`${createForm.first_name} ${createForm.last_name}`}
+                      size="lg"
+                    />
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                       <label className="btn btn-secondary" style={{ cursor: 'pointer', textAlign: 'center', fontSize: 'var(--font-size-xs)' }}>
-                        {uploadingPhoto ? '⏳ Uploading to Cloudinary...' : '📁 Upload Photo (Cloudinary)'}
+                        {uploadingPhoto ? '⏳ በመጫን ላይ...' : '📁 ፎቶ ይጫኑ (Upload)'}
                         <input
                           type="file"
                           accept="image/*"
@@ -537,7 +496,7 @@ export default function ManageStudents() {
                       <input
                         className="form-input"
                         name="photo_url"
-                        placeholder="Or paste image URL (Optional)"
+                        placeholder="ወይም የፎቶ ሊንክ ያስገቡ (አማራጭ)"
                         value={createForm.photo_url}
                         onChange={(e) => setCreateForm((prev) => ({ ...prev, photo_url: e.target.value }))}
                         style={{ fontSize: 'var(--font-size-xs)' }}
@@ -548,11 +507,11 @@ export default function ManageStudents() {
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label className="form-label">First Name * (Student's Login Key)</label>
+                    <label className="form-label">የመጀመሪያ ስም (የተማሪ መግቢያ ቁልፍ) *</label>
                     <input
                       className="form-input"
                       name="first_name"
-                      placeholder="e.g. Maya"
+                      placeholder="ለምሳሌ፡ Nuhamin"
                       value={createForm.first_name}
                       onChange={(e) => setCreateForm((prev) => ({ ...prev, first_name: e.target.value }))}
                       required
@@ -560,11 +519,11 @@ export default function ManageStudents() {
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Last Name *</label>
+                    <label className="form-label">የአባት ስም *</label>
                     <input
                       className="form-input"
                       name="last_name"
-                      placeholder="e.g. Lin"
+                      placeholder="ለምሳሌ፡ Abraham"
                       value={createForm.last_name}
                       onChange={(e) => setCreateForm((prev) => ({ ...prev, last_name: e.target.value }))}
                       required
@@ -573,18 +532,18 @@ export default function ManageStudents() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Username (Optional — auto-generated if left blank)</label>
+                  <label className="form-label">የተጠቃሚ ስም (አማራጭ — ካልሞላ በራስ-ሰር ይሰራል)</label>
                   <input
                     className="form-input"
                     name="username"
-                    placeholder="e.g. maya.lin"
+                    placeholder="ለምሳሌ፡ nuhamin.abraham"
                     value={createForm.username}
                     onChange={(e) => setCreateForm((prev) => ({ ...prev, username: e.target.value }))}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Email (Optional)</label>
+                  <label className="form-label">ኢሜይል (አማራጭ)</label>
                   <input
                     className="form-input"
                     type="email"
@@ -598,10 +557,10 @@ export default function ManageStudents() {
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowCreateModal(false)}>
-                  Cancel
+                  ይቅር
                 </button>
                 <button type="submit" className="btn btn-primary" disabled={uploadingPhoto}>
-                  {uploadingPhoto ? 'Uploading Photo...' : 'Register Student'}
+                  {uploadingPhoto ? 'በመጫን ላይ...' : 'ተማሪውን መዝግብ'}
                 </button>
               </div>
             </form>

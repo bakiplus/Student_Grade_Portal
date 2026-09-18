@@ -192,9 +192,8 @@ class CreateStudentSerializer(serializers.ModelSerializer):
                 counter += 1
             validated_data['username'] = username
 
-        # Default avatar if photo_url is empty
-        if not photo_url:
-            validated_data['photo_url'] = f"https://api.dicebear.com/7.x/avataaars/svg?seed={first_name}{last_name}"
+        # Keep photo_url blank/empty if not uploaded
+        validated_data['photo_url'] = photo_url
 
         user = User(**validated_data, role='student')
         user.set_password(secrets.token_urlsafe(32))
@@ -227,11 +226,7 @@ class UpdateStudentSerializer(serializers.ModelSerializer):
         if 'email' in validated_data:
             instance.email = validated_data['email'].strip()
         if 'photo_url' in validated_data:
-            photo = validated_data['photo_url'].strip() if validated_data['photo_url'] else ''
-            # If empty, fallback to avatar
-            if not photo:
-                photo = f"https://api.dicebear.com/7.x/avataaars/svg?seed={instance.first_name}{instance.last_name}"
-            instance.photo_url = photo
+            instance.photo_url = validated_data['photo_url'].strip() if validated_data['photo_url'] else ''
 
         instance.save()
         return instance
