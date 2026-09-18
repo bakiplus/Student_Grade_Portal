@@ -101,81 +101,82 @@ for data in instructors_data:
 
 # ─── Create Students (with Profile Avatars) ───────────────────────────────────
 
-students_data = [
-    {
-        'username': 'alice.wonder',
-        'email': 'alice@student.com',
-        'first_name': 'Alice',
-        'last_name': 'Wonder',
-        'photo_url': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-        'username': 'bob.miller',
-        'email': 'bob@student.com',
-        'first_name': 'Bob',
-        'last_name': 'Miller',
-        'photo_url': 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-        'username': 'charlie.davis',
-        'email': 'charlie@student.com',
-        'first_name': 'Charlie',
-        'last_name': 'Davis',
-        'photo_url': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-        'username': 'diana.ross',
-        'email': 'diana@student.com',
-        'first_name': 'Diana',
-        'last_name': 'Ross',
-        'photo_url': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-        'username': 'edward.kim',
-        'email': 'edward@student.com',
-        'first_name': 'Edward',
-        'last_name': 'Kim',
-        'photo_url': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-        'username': 'fiona.chen',
-        'email': 'fiona@student.com',
-        'first_name': 'Fiona',
-        'last_name': 'Chen',
-        'photo_url': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-        'username': 'george.brown',
-        'email': 'george@student.com',
-        'first_name': 'George',
-        'last_name': 'Brown',
-        'photo_url': 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop&q=80',
-    },
-    {
-        'username': 'hannah.white',
-        'email': 'hannah@student.com',
-        'first_name': 'Hannah',
-        'last_name': 'White',
-        'photo_url': 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80',
-    },
+students_raw = [
+    ("Nuhamin", "Abraham"),
+    ("Nuhamin", "Selamu"),
+    ("Nuhamin", "Bekele"),
+    ("Betelhem", "Dese"),
+    ("Betemariam", "Matewos"),
+    ("Nebiyu", "Samuel"),
+    ("Yostena", "Marshet"),
+    ("Tinsae", "Melaku"),
+    ("Eyasu", "Melkamu"),
+    ("Hana", "Amare"),
+    ("Sosina", "Solomon"),
+    ("Hermela", "Tariku"),
+    ("Mekdes", "Daniel"),
+    ("Eldana", "Amene"),
+    ("Kiber", "Yilkal"),
+    ("Yonas", "Asfaw"),
+    ("Tebarek", "Solomon"),
+    ("Dagim", "Fiseha"),
+    ("Yohannes", "Fiseha"),
+    ("Elias", "Birhanu"),
+    ("Kirubel", "Asefa"),
+    ("Beanchi", "Amlak Molla"),
+    ("Danawit", "Fentahun"),
+    ("Nardos", "Atanaw"),
+    ("Mihret", "Asemaraw"),
+    ("Meron", "Tefera"),
+    ("Roza", "Muluqen"),
+    ("Eitsubdink", "Dawit"),
+    ("Yeabsira", "Andargachew"),
+    ("Tsion", "Melaku"),
+    ("Elsabet", "Amare"),
 ]
+
+students_data = []
+for index, (first_name, last_name) in enumerate(students_raw, start=1):
+    clean_first = first_name.strip()
+    clean_last = last_name.strip()
+    clean_first_user = clean_first.lower().replace(' ', '')
+    clean_last_user = clean_last.lower().replace(' ', '')
+    username = f"{clean_first_user}.{clean_last_user}"
+    email = f"{clean_first_user}.{clean_last_user}@student.com"
+    seed_name = f"{clean_first}{clean_last.replace(' ', '')}"
+    photo_url = f"https://api.dicebear.com/7.x/avataaars/svg?seed={seed_name}"
+    student_id = f"STU-26{index:04d}"
+
+    students_data.append({
+        'username': username,
+        'email': email,
+        'first_name': clean_first,
+        'last_name': clean_last,
+        'photo_url': photo_url,
+        'student_id': student_id,
+    })
 
 students = []
 for data in students_data:
+    stu_id = data.pop('student_id')
     photo = data.get('photo_url')
     student, created = User.objects.get_or_create(
         username=data['username'],
-        defaults={**data, 'role': 'student'},
+        defaults={**data, 'role': 'student', 'student_id': stu_id},
     )
-    if not created and (not student.photo_url or student.photo_url != photo):
+    if not created:
+        student.first_name = data['first_name']
+        student.last_name = data['last_name']
+        student.student_id = stu_id
         student.photo_url = photo
+        student.role = 'student'
         student.save()
     if created:
         student.set_password(secrets.token_urlsafe(32))
         student.save()
         print(f"✓ Created student: {student.get_full_name()} (ID: {student.student_id}, First Name: {student.first_name})")
     else:
-        print(f"· Student {student.get_full_name()} already exists (ID: {student.student_id})")
+        print(f"· Student {student.get_full_name()} updated (ID: {student.student_id})")
     students.append(student)
 
 # ─── Create Courses ───────────────────────────────────────────────────────────
@@ -252,9 +253,9 @@ for course in courses:
 # ─── Enroll Students ─────────────────────────────────────────────────────────
 
 enrollment_map = {
-    'CS101': students[:8],
-    'MATH201': students[:6],
-    'ENG102': students[2:8],
+    'CS101': students,
+    'MATH201': students[:20],
+    'ENG102': students[10:],
 }
 
 for course in courses:
@@ -310,5 +311,5 @@ print(f"  Instructor:  dr.smith / instructor123")
 print(f"  Instructor:  dr.johnson / instructor123")
 print("\n--- Student Accounts (Student ID + First Name) ---")
 for s in students:
-    print(f"  Student:     {s.get_full_name():<16} ID: {s.student_id:<12} First Name: {s.first_name}")
+    print(f"  Student:     {s.get_full_name():<26} ID: {s.student_id:<12} First Name: {s.first_name}")
 print()
