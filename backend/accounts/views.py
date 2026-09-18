@@ -18,6 +18,7 @@ from .serializers import (
     StudentLoginSerializer,
     UserSerializer,
     CreateStudentSerializer,
+    UpdateStudentSerializer,
     CreateInstructorSerializer,
 )
 
@@ -162,6 +163,22 @@ class StudentListCreateView(generics.ListCreateAPIView):
                 | models.Q(username__icontains=search)
             )
         return queryset
+
+
+class StudentDetailUpdateView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET    /api/auth/students/<id>/ — Get student details
+    PUT    /api/auth/students/<id>/ — Full update student details & photo
+    PATCH  /api/auth/students/<id>/ — Partial update student details & photo
+    DELETE /api/auth/students/<id>/ — Delete student account
+    """
+    permission_classes = [IsInstructor]
+    queryset = User.objects.filter(role='student')
+
+    def get_serializer_class(self):
+        if self.request.method in ['PUT', 'PATCH']:
+            return UpdateStudentSerializer
+        return UserSerializer
 
 
 class InstructorListCreateView(generics.ListCreateAPIView):

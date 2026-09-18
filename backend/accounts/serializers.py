@@ -200,3 +200,38 @@ class CreateStudentSerializer(serializers.ModelSerializer):
         user.set_password(secrets.token_urlsafe(32))
         user.save()
         return user
+
+
+class UpdateStudentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for instructors to update student info and upload/modify optional photo_url.
+    """
+    first_name = serializers.CharField(required=False, max_length=150)
+    last_name = serializers.CharField(required=False, max_length=150)
+    email = serializers.EmailField(required=False, allow_blank=True)
+    photo_url = serializers.CharField(required=False, allow_blank=True, max_length=500)
+
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'email', 'first_name', 'last_name',
+            'photo_url', 'student_id',
+        ]
+        read_only_fields = ['id', 'username', 'student_id']
+
+    def update(self, instance, validated_data):
+        if 'first_name' in validated_data:
+            instance.first_name = validated_data['first_name'].strip()
+        if 'last_name' in validated_data:
+            instance.last_name = validated_data['last_name'].strip()
+        if 'email' in validated_data:
+            instance.email = validated_data['email'].strip()
+        if 'photo_url' in validated_data:
+            photo = validated_data['photo_url'].strip() if validated_data['photo_url'] else ''
+            # If empty, fallback to avatar
+            if not photo:
+                photo = f"https://api.dicebear.com/7.x/avataaars/svg?seed={instance.first_name}{instance.last_name}"
+            instance.photo_url = photo
+
+        instance.save()
+        return instance

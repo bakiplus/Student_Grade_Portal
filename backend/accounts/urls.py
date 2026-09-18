@@ -16,5 +16,6 @@ urlpatterns = [
     path('upload-photo/', views.PhotoUploadView.as_view(), name='auth-upload-photo'),
     # Student & Instructor management
     path('students/', views.StudentListCreateView.as_view(), name='student-list-create'),
+    path('students/<int:pk>/', views.StudentDetailUpdateView.as_view(), name='student-detail-update'),
     path('instructors/', views.InstructorListCreateView.as_view(), name='instructor-list-create'),
 ]

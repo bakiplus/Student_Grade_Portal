@@ -86,13 +86,24 @@ class UserAdminAddForm(forms.ModelForm):
         return user
 
 
+from django.utils.html import format_html
+
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     add_form = UserAdminAddForm
-    list_display = ['username', 'email', 'first_name', 'last_name', 'role', 'student_id', 'is_staff', 'is_superuser', 'is_active']
+    list_display = ['photo_thumbnail', 'username', 'email', 'first_name', 'last_name', 'role', 'student_id', 'is_staff', 'is_superuser', 'is_active']
     list_filter = ['role', 'is_active', 'is_staff', 'is_superuser']
     search_fields = ['username', 'email', 'first_name', 'last_name', 'student_id']
     ordering = ['last_name', 'first_name']
+
+    def photo_thumbnail(self, obj):
+        url = obj.photo_url or f"https://api.dicebear.com/7.x/avataaars/svg?seed={obj.first_name}{obj.last_name}"
+        return format_html(
+            '<img src="{}" style="width:32px; height:32px; border-radius:50%; object-fit:cover; border:1px solid #ccc;" />',
+            url
+        )
+    photo_thumbnail.short_description = "Photo"
 
     fieldsets = BaseUserAdmin.fieldsets + (
         ('Role & Student Info', {
