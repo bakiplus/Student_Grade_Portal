@@ -183,14 +183,36 @@ students_raw = [
     ("Betlehem", "Tamirat", "STU-260097"),
     ("Maryam Awit", "Habtamu", "STU-260098"),
     ("Mahlet", "Kibrom", "STU-260099"),
+
+    # Batch 4 Students (STU-260100 to STU-260119)
+    ("Arsema", "Birhanu", "STU-260100"),
+    ("Saron", "Asfaw", "STU-260101"),
+    ("Etsubdink", "Tamrat", "STU-260102"),
+    ("Yordanos", "T/Maryam", "STU-260103"),
+    ("Atnasya", "Atnafu", "STU-260104"),
+    ("Solomon", "Zemene", "STU-260105"),
+    ("Ruth", "Chalachew", "STU-260106"),
+    ("Henok", "Demeke", "STU-260107"),
+    ("Netsanet", "Feleke", "STU-260108"),
+    ("Yohans", "T/Mariyam", "STU-260109"),
+    ("Hilina", "Dawit", "STU-260110"),
+    ("Tigist", "Eyayaw", "STU-260111"),
+    ("Ashenafi", "Muluneh", "STU-260112"),
+    ("Natnael", "Abebe", "STU-260113"),
+    ("Kidus", "Melaku", "STU-260114"),
+    ("Biruk", "Mekashaw", "STU-260115"),
+    ("Bereket", "Birhanu", "STU-260116"),
+    ("Yabsra", "Haylu", "STU-260117"),
+    ("Mahilet", "Liul", "STU-260118"),
+    ("Eyerusalem", "Berihun", "STU-260119"),
 ]
 
 students_data = []
 for (first_name, last_name, student_id) in students_raw:
     clean_first = first_name.strip()
     clean_last = last_name.strip()
-    clean_first_user = clean_first.lower().replace(' ', '').replace("'", "").replace("’", "")
-    clean_last_user = clean_last.lower().replace(' ', '').replace("'", "").replace("’", "")
+    clean_first_user = clean_first.lower().replace(' ', '').replace("'", "").replace("’", "").replace('/', '')
+    clean_last_user = clean_last.lower().replace(' ', '').replace("'", "").replace("’", "").replace('/', '')
     username = f"{clean_first_user}.{clean_last_user}"
     email = f"{clean_first_user}.{clean_last_user}@student.com"
 

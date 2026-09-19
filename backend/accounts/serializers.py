@@ -75,7 +75,8 @@ AMHARIC_NAME_MAP = {
     # Batch 3 Students
     'ታዴዎስ': 'tadewos', 'ታደዎስ': 'tadewos', 'ታዲዎስ': 'tadewos',
     'ብሌን': 'blen', 'ብለን': 'blen',
-    'እየሩሳሌም': 'jerusalem', 'ኢየሩሳሌም': 'jerusalem', 'የሩሳሌም': 'jerusalem', 'ዬሩሳሌም': 'jerusalem',
+    'እየሩሳሌም': ('jerusalem', 'eyerusalem', 'yerusalem'), 'ኢየሩሳሌም': ('jerusalem', 'eyerusalem', 'yerusalem'),
+    'የሩሳሌም': ('jerusalem', 'eyerusalem', 'yerusalem'), 'ዬሩሳሌም': ('jerusalem', 'eyerusalem', 'yerusalem'),
     'ዮርዳኖስ': 'yordanos', 'ዮረዳኖስ': 'yordanos',
     'ናታኔም': 'natanem', 'ናታነም': 'natanem', 'ናታንኤም': 'natanem',
     'ጳውሎስ': 'pawlos', 'ፓውሎስ': 'pawlos',
@@ -85,6 +86,23 @@ AMHARIC_NAME_MAP = {
     'ሳምራዊት': 'samrawit', 'ሳምሪ': 'samrawit',
     'መሰረት': 'meseret', 'መሠረት': 'meseret', 'መስረት': 'meseret',
     'ማርያም አዊት': 'maryam awit', 'ማርያማዊት': 'maryam awit', 'ማሪያማዊት': 'maryam awit',
+
+    # Batch 4 Students
+    'አርሴማ': 'arsema', 'አርሰማ': 'arsema',
+    'ሳሮን': 'saron',
+    'ሰሎሞን': 'solomon', 'ሶሎሞን': 'solomon',
+    'ሩት': 'ruth', 'ሩታ': 'ruth',
+    'ሄኖክ': 'henok', 'ሔኖክ': 'henok', 'ሀኖክ': 'henok',
+    'ነጻነት': 'netsanet', 'ነፃነት': 'netsanet', 'ነፀነት': 'netsanet',
+    'ዮሃንስ': ('yohans', 'yohannes'), 'ዮሀንስ': ('yohans', 'yohannes'),
+    'ሂሊና': 'hilina', 'ህሊና': 'hilina', 'ሕሊና': 'hilina',
+    'ትዕግስት': 'tigist', 'ትግስት': 'tigist', 'ትእግስት': 'tigist',
+    'አሸናፊ': 'ashenafi',
+    'ናትናኤል': 'natnael', 'ናትኒኤል': 'natnael',
+    'ቅዱስ': 'kidus',
+    'ብሩክ': 'biruk', 'ቢሩክ': 'biruk',
+    'በረከት': 'bereket',
+    'ማሂሌት': ('mahilet', 'mahlet'), 'ማሂለት': ('mahilet', 'mahlet'),
 
     # Additional standard names
     'ቤተልሔም': 'betlehem', 'ቤቴልሔም': 'betlehem', 'ቤተልሄም': 'betlehem',
@@ -102,7 +120,7 @@ AMHARIC_NAME_MAP = {
     'ዮናስ': 'yonas',
     'ተባረክ': 'tebarek',
     'ዳግም': 'dagim',
-    'ዮሐንስ': 'yohannes',
+    'ዮሐንስ': ('yohannes', 'yohans'),
     'ኤልያስ': 'elias',
     'ኪሩቤል': 'kirubel',
     'ዳናዊት': 'danawit',
@@ -110,10 +128,10 @@ AMHARIC_NAME_MAP = {
     'ምሕረት': 'mihret',
     'ሜሮን': 'meron',
     'ሮዛ': 'roza',
-    'ዕፁብድንቅ': 'eitsubdink', 'እጹብድንቅ': 'eitsubdink',
+    'ዕፁብድንቅ': ('eitsubdink', 'etsubdink'), 'እጹብድንቅ': ('eitsubdink', 'etsubdink'),
     'ጽዮን': 'tsion', 'ፂዮን': 'tsion',
     'ኤልሳቤጥ': 'elsabet', 'ኤልሳቤት': 'elsabet',
-    'አትናስያ': 'athnasiya', 'አትናሲያ': 'athnasiya',
+    'አትናስያ': ('athnasiya', 'atnasya', 'atnasiya'), 'አትናሲያ': ('athnasiya', 'atnasya', 'atnasiya'),
 }
 
 
@@ -151,7 +169,8 @@ class StudentLoginSerializer(serializers.Serializer):
             return (s or '').lower().replace("'", "").replace("’", "").replace("-", "").strip()
 
         first_word = raw_first_name.split()[0] if raw_first_name else ''
-        mapped_name = AMHARIC_NAME_MAP.get(raw_first_name, AMHARIC_NAME_MAP.get(first_word, ''))
+        mapped_raw = AMHARIC_NAME_MAP.get(raw_first_name, AMHARIC_NAME_MAP.get(first_word, []))
+        mapped_names = [mapped_raw] if isinstance(mapped_raw, str) else list(mapped_raw)
 
         db_first = (student.first_name or '').strip().lower()
         clean_db_first = clean_str(student.first_name)
@@ -161,10 +180,14 @@ class StudentLoginSerializer(serializers.Serializer):
         clean_input = clean_str(raw_first_name)
         clean_first_word = clean_str(first_word)
 
-        # Verify match with English name, Amharic transliteration, or full name
+        # Verify match with English name, Amharic transliteration(s), or full name
+        is_mapped_match = any(
+            (m and m == clean_db_first) or (m and m in clean_db_full)
+            for m in mapped_names
+        )
+
         is_match = (
-            (mapped_name and mapped_name == clean_db_first) or
-            (mapped_name and mapped_name in clean_db_full) or
+            is_mapped_match or
             clean_first_word == clean_db_first or
             clean_input == clean_db_first or
             clean_db_first in clean_input or
