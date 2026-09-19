@@ -143,10 +143,10 @@ export default function CourseResult() {
               <tr key={idx}>
                 <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{item.component}</td>
                 <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.score}</td>
-                <td>{item.max_score}</td>
+                {/* <td>{item.max_score}</td>
                 <td>
                   <span className="badge badge-info">{item.weight}%</span>
-                </td>
+                </td> */}
                 <td style={{ fontWeight: 600, color: 'var(--accent-primary-hover)' }}>{item.weighted_score}%</td>
               </tr>
             ))}
