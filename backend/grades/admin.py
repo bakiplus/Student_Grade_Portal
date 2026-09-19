@@ -20,10 +20,10 @@ class StudentGradeAdmin(admin.ModelAdmin):
 @admin.register(Result)
 class ResultAdmin(admin.ModelAdmin):
     list_display = [
-        'enrollment', 'total_score', 'letter_grade', 'passed',
+        'enrollment', 'total_score', 'passed',
         'rank', 'is_published', 'published_at',
     ]
-    list_filter = ['is_published', 'letter_grade', 'passed']
+    list_filter = ['is_published', 'passed']
     search_fields = [
         'enrollment__student__first_name',
         'enrollment__student__last_name',

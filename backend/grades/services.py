@@ -9,27 +9,6 @@ from courses.models import Course, Enrollment, GradeComponent
 from .models import StudentGrade, Result
 
 
-# ─── Grading Scale ────────────────────────────────────────────────────────────
-
-GRADING_SCALE = [
-    (Decimal('90'), 'A',  True),
-    (Decimal('85'), 'B+', True),
-    (Decimal('80'), 'B',  True),
-    (Decimal('75'), 'C+', True),
-    (Decimal('70'), 'C',  True),
-    (Decimal('60'), 'D',  True),
-    (Decimal('0'),  'F',  False),
-]
-
-
-def get_letter_grade(total_score):
-    """Return (letter_grade, passed) tuple based on total score."""
-    for threshold, grade, passed in GRADING_SCALE:
-        if total_score >= threshold:
-            return grade, passed
-    return 'F', False
-
-
 # ─── Result Calculation ──────────────────────────────────────────────────────
 
 def calculate_course_results(course_id, instructor):
@@ -93,12 +72,12 @@ def calculate_course_results(course_id, instructor):
             total_score += component_score
 
         total_score = total_score.quantize(Decimal('0.01'))
-        letter_grade, passed = get_letter_grade(total_score)
+        passed = total_score >= Decimal('50.00')
 
         results_data.append({
             'enrollment': enrollment,
             'total_score': total_score,
-            'letter_grade': letter_grade,
+            'letter_grade': '',
             'passed': passed,
         })
 

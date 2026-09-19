@@ -773,14 +773,6 @@ function ResultsTab({ courseId, onMessage }) {
     }
   };
 
-  const getGradeColor = (grade) => {
-    if (grade === 'A') return 'var(--grade-a)';
-    if (grade?.startsWith('B')) return 'var(--grade-b)';
-    if (grade?.startsWith('C')) return 'var(--grade-c)';
-    if (grade === 'D') return 'var(--grade-d)';
-    return 'var(--grade-f)';
-  };
-
   if (loading) {
     return <div className="loading-container"><div className="spinner" /></div>;
   }
@@ -833,7 +825,6 @@ function ResultsTab({ courseId, onMessage }) {
                 <th>ተማሪ</th>
                 <th>የተማሪ መታወቂያ</th>
                 <th>ጠቅላላ ውጤት</th>
-                <th>የውጤት ፊደል</th>
                 <th>ሁኔታ</th>
                 <th>ይፋዊነት</th>
               </tr>
@@ -870,17 +861,6 @@ function ResultsTab({ courseId, onMessage }) {
                   </td>
                   <td style={{ fontWeight: 600, color: 'var(--text-primary)' }}>
                     {result.total_score}%
-                  </td>
-                  <td>
-                    <span
-                      className="badge badge-grade"
-                      style={{
-                        color: getGradeColor(result.letter_grade),
-                        background: `${getGradeColor(result.letter_grade)}20`,
-                      }}
-                    >
-                      {result.letter_grade}
-                    </span>
                   </td>
                   <td>
                     <span className={`badge ${result.passed ? 'badge-success' : 'badge-error'}`}>

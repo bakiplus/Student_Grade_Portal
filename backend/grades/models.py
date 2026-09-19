@@ -66,7 +66,7 @@ class Result(models.Model):
         decimal_places=2,
         help_text="Weighted total score out of 100",
     )
-    letter_grade = models.CharField(max_length=5)
+    letter_grade = models.CharField(max_length=5, blank=True, default='')
     passed = models.BooleanField()
     rank = models.PositiveIntegerField(
         null=True,
@@ -86,5 +86,5 @@ class Result(models.Model):
     def __str__(self):
         return (
             f"{self.enrollment.student.get_full_name()} — "
-            f"{self.enrollment.course.code}: {self.total_score} ({self.letter_grade})"
+            f"{self.enrollment.course.code}: {self.total_score}%"
         )
