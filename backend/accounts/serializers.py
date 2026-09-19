@@ -99,6 +99,7 @@ AMHARIC_NAME_MAP = {
     'ዕፁብድንቅ': 'eitsubdink', 'እጹብድንቅ': 'eitsubdink',
     'ጽዮን': 'tsion', 'ፂዮን': 'tsion',
     'ኤልሳቤጥ': 'elsabet', 'ኤልሳቤት': 'elsabet',
+    'አትናስያ': 'athnasiya', 'አትናሲያ': 'athnasiya',
 }
 
 

@@ -134,8 +134,9 @@ students_raw = [
     ("Yeabsira", "Andargachew"),
     ("Tsion", "Melaku"),
     ("Elsabet", "Amare"),
+    ("Athnasiya", "Tizazu"),
 
-    # Continued Students (STU-260032 to STU-260051)
+    # Continued Students (STU-260033 to STU-260052)
     ("Rakeb", "Tesfaye"),
     ("Etsgenet", "Tesfaye"),
     ("Mahlet", "Solomon"),
