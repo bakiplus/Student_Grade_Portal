@@ -133,7 +133,7 @@ export default function LoginPage({ mode: initialMode = 'student' }) {
                 id="firstName"
                 className="form-input"
                 type="text"
-                placeholder="ለምሳሌ፡ Nuhamin ወይም Betelhem"
+                placeholder="ለምሳሌ፡ Nuhamin ወይም Solomon"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 required
@@ -174,7 +174,7 @@ export default function LoginPage({ mode: initialMode = 'student' }) {
                 id="username"
                 className="form-input"
                 type="text"
-                placeholder="biruk ወይም Isaac ወይም admin"
+                placeholder="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required

@@ -128,8 +128,7 @@ export default function StudentDashboard() {
                 <div className="course-name">{course.course_name}</div>
 
                 <div className="course-meta">
-                  <div className="course-meta-item">📝 {course.credit_hours} ክሬዲት ሰዓት</div>
-                  <div className="course-meta-item">👤 {course.instructor_name}</div>
+
                   {course.has_result && (
                     <div className="course-meta-item">
                       {course.passed ? (

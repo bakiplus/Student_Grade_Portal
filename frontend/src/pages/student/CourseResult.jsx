@@ -83,8 +83,6 @@ export default function CourseResult() {
           <h2 className="student-name-heading">{result.student_name || `${user?.first_name} ${user?.last_name}`}</h2>
           <div className="student-meta-row">
             <span>📚 <strong>ኮርስ፡</strong> {result.course_code} — {result.course_name}</span>
-            <span>👨‍🏫 <strong>አስተማሪ፡</strong> {result.instructor_name}</span>
-            <span>⏱️ <strong>ክሬዲት፡</strong> {result.credit_hours} ሰዓት</span>
           </div>
         </div>
       </div>
