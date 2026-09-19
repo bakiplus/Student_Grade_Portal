@@ -6,6 +6,11 @@ Usage: python manage.py shell < seed_data.py
 """
 
 import os
+import sys
+
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+
 import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
@@ -102,72 +107,92 @@ for data in instructors_data:
 # ─── Create Students (with Profile Avatars) ───────────────────────────────────
 
 students_raw = [
-    # Original Students (STU-260001 to STU-260031)
-    ("Nuhamin", "Abraham"),
-    ("Nuhamin", "Selamu"),
-    ("Nuhamin", "Bekele"),
-    ("Betelhem", "Dese"),
-    ("Betemariam", "Matewos"),
-    ("Nebiyu", "Samuel"),
-    ("Yostena", "Marshet"),
-    ("Tinsae", "Melaku"),
-    ("Eyasu", "Melkamu"),
-    ("Hana", "Amare"),
-    ("Sosina", "Solomon"),
-    ("Hermela", "Tariku"),
-    ("Mekdes", "Daniel"),
-    ("Eldana", "Amene"),
-    ("Kiber", "Yilkal"),
-    ("Yonas", "Asfaw"),
-    ("Tebarek", "Solomon"),
-    ("Dagim", "Fiseha"),
-    ("Yohannes", "Fiseha"),
-    ("Elias", "Birhanu"),
-    ("Kirubel", "Asefa"),
-    ("Beanchi", "Amlak Molla"),
-    ("Danawit", "Fentahun"),
-    ("Nardos", "Atanaw"),
-    ("Mihret", "Asemaraw"),
-    ("Meron", "Tefera"),
-    ("Roza", "Muluqen"),
-    ("Eitsubdink", "Dawit"),
-    ("Yeabsira", "Andargachew"),
-    ("Tsion", "Melaku"),
-    ("Elsabet", "Amare"),
-    ("Athnasiya", "Tizazu"),
+    # Original Students (STU-260001 to STU-260032)
+    ("Nuhamin", "Abraham", "STU-260001"),
+    ("Nuhamin", "Selamu", "STU-260002"),
+    ("Nuhamin", "Bekele", "STU-260003"),
+    ("Betelhem", "Dese", "STU-260004"),
+    ("Betemariam", "Matewos", "STU-260005"),
+    ("Nebiyu", "Samuel", "STU-260006"),
+    ("Yostena", "Marshet", "STU-260007"),
+    ("Tinsae", "Melaku", "STU-260008"),
+    ("Eyasu", "Melkamu", "STU-260009"),
+    ("Hana", "Amare", "STU-260010"),
+    ("Sosina", "Solomon", "STU-260011"),
+    ("Hermela", "Tariku", "STU-260012"),
+    ("Mekdes", "Daniel", "STU-260013"),
+    ("Eldana", "Amene", "STU-260014"),
+    ("Kiber", "Yilkal", "STU-260015"),
+    ("Yonas", "Asfaw", "STU-260016"),
+    ("Tebarek", "Solomon", "STU-260017"),
+    ("Dagim", "Fiseha", "STU-260018"),
+    ("Yohannes", "Fiseha", "STU-260019"),
+    ("Elias", "Birhanu", "STU-260020"),
+    ("Kirubel", "Asefa", "STU-260021"),
+    ("Beanchi", "Amlak Molla", "STU-260022"),
+    ("Danawit", "Fentahun", "STU-260023"),
+    ("Nardos", "Atanaw", "STU-260024"),
+    ("Mihret", "Asemaraw", "STU-260025"),
+    ("Meron", "Tefera", "STU-260026"),
+    ("Roza", "Muluqen", "STU-260027"),
+    ("Eitsubdink", "Dawit", "STU-260028"),
+    ("Yeabsira", "Andargachew", "STU-260029"),
+    ("Tsion", "Melaku", "STU-260030"),
+    ("Elsabet", "Amare", "STU-260031"),
+    ("Athnasiya", "Tizazu", "STU-260032"),
 
     # Continued Students (STU-260033 to STU-260052)
-    ("Rakeb", "Tesfaye"),
-    ("Etsgenet", "Tesfaye"),
-    ("Mahlet", "Solomon"),
-    ("Be'Emnet", "Kendu"),
-    ("Makda", "Getaneh"),
-    ("Salome", "Asemaraw"),
-    ("Bezawit", "Birhane"),
-    ("Rodas", "Abebe"),
-    ("Edom", "Mulualem"),
-    ("Yemisirach", "Baya"),
-    ("Melos", "Yigzaw"),
-    ("Nuamin", "Melaku"),
-    ("Absalat", "Selamsew"),
-    ("Yabsira", "Dawit"),
-    ("Philemon", "Fasil"),
-    ("Abel", "Sigtetaw"),
-    ("Daniel", "Yoseph"),
-    ("Yoseph", "Marshet"),
-    ("Surafel", "Dejen"),
-    ("Yonatan", "Abiy"),
+    ("Rakeb", "Tesfaye", "STU-260033"),
+    ("Etsgenet", "Tesfaye", "STU-260034"),
+    ("Mahlet", "Solomon", "STU-260035"),
+    ("Be'Emnet", "Kendu", "STU-260036"),
+    ("Makda", "Getaneh", "STU-260037"),
+    ("Salome", "Asemaraw", "STU-260038"),
+    ("Bezawit", "Birhane", "STU-260039"),
+    ("Rodas", "Abebe", "STU-260040"),
+    ("Edom", "Mulualem", "STU-260041"),
+    ("Yemisirach", "Baya", "STU-260042"),
+    ("Melos", "Yigzaw", "STU-260043"),
+    ("Nuamin", "Melaku", "STU-260044"),
+    ("Absalat", "Selamsew", "STU-260045"),
+    ("Yabsira", "Dawit", "STU-260046"),
+    ("Philemon", "Fasil", "STU-260047"),
+    ("Abel", "Sigtetaw", "STU-260048"),
+    ("Daniel", "Yoseph", "STU-260049"),
+    ("Yoseph", "Marshet", "STU-260050"),
+    ("Surafel", "Dejen", "STU-260051"),
+    ("Yonatan", "Abiy", "STU-260052"),
+
+    # Batch 3 Students (STU-260081 to STU-260099)
+    ("Tadewos", "Abebe", "STU-260081"),
+    ("Blen", "Asmamaw", "STU-260082"),
+    ("Jerusalem", "Molla", "STU-260083"),
+    ("Yordanos", "Ayechew", "STU-260084"),
+    ("Natanem", "Amanuel", "STU-260085"),
+    ("Surafel", "Andarge", "STU-260086"),
+    ("Pawlos", "Birhanu", "STU-260087"),
+    ("Absalaat", "Alelegn", "STU-260088"),
+    ("Saba", "Desalegn", "STU-260089"),
+    ("Zakarias", "Abush", "STU-260090"),
+    ("Nuhamin", "Merkebu", "STU-260091"),
+    ("Edom", "Setegn", "STU-260092"),
+    ("Kibru LeAb", "Wasihun", "STU-260093"),
+    ("Samrawit", "Getu", "STU-260094"),
+    ("Meseret", "Birhanu", "STU-260095"),
+    ("Yoseph", "Andinet", "STU-260096"),
+    ("Betlehem", "Tamirat", "STU-260097"),
+    ("Maryam Awit", "Habtamu", "STU-260098"),
+    ("Mahlet", "Kibrom", "STU-260099"),
 ]
 
 students_data = []
-for index, (first_name, last_name) in enumerate(students_raw, start=1):
+for (first_name, last_name, student_id) in students_raw:
     clean_first = first_name.strip()
     clean_last = last_name.strip()
     clean_first_user = clean_first.lower().replace(' ', '').replace("'", "").replace("’", "")
     clean_last_user = clean_last.lower().replace(' ', '').replace("'", "").replace("’", "")
     username = f"{clean_first_user}.{clean_last_user}"
     email = f"{clean_first_user}.{clean_last_user}@student.com"
-    student_id = f"STU-26{index:04d}"
 
     students_data.append({
         'username': username,
@@ -182,23 +207,40 @@ students = []
 for data in students_data:
     stu_id = data.pop('student_id')
     photo = data.get('photo_url')
-    student, created = User.objects.get_or_create(
-        username=data['username'],
-        defaults={**data, 'role': 'student', 'student_id': stu_id},
-    )
-    if not created:
-        student.first_name = data['first_name']
-        student.last_name = data['last_name']
-        student.student_id = stu_id
-        student.photo_url = photo
-        student.role = 'student'
-        student.save()
-    if created:
+
+    student = User.objects.filter(student_id=stu_id).first()
+    if not student:
+        student = User.objects.filter(username=data['username']).first()
+    if not student:
+        student = User.objects.filter(first_name__iexact=data['first_name'], last_name__iexact=data['last_name']).first()
+
+    if not student:
+        student = User(
+            username=data['username'],
+            role='student',
+            student_id=stu_id,
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            email=data['email'],
+            photo_url=photo or '',
+            is_active=True,
+        )
         student.set_password(secrets.token_urlsafe(32))
         student.save()
         print(f"✓ Created student: {student.get_full_name()} (ID: {student.student_id}, First Name: {student.first_name})")
     else:
+        student.first_name = data['first_name']
+        student.last_name = data['last_name']
+        student.student_id = stu_id
+        student.username = data['username']
+        student.email = data['email']
+        student.role = 'student'
+        student.is_active = True
+        if photo:
+            student.photo_url = photo
+        student.save()
         print(f"· Student {student.get_full_name()} updated (ID: {student.student_id})")
+
     students.append(student)
 
 # ─── Create Courses ───────────────────────────────────────────────────────────

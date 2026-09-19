@@ -72,8 +72,22 @@ AMHARIC_NAME_MAP = {
     'ሱራፌል': 'surafel', 'ሱራፈል': 'surafel', 'ሱራፊል': 'surafel',
     'ዮናታን': 'yonatan',
 
+    # Batch 3 Students
+    'ታዴዎስ': 'tadewos', 'ታደዎስ': 'tadewos', 'ታዲዎስ': 'tadewos',
+    'ብሌን': 'blen', 'ብለን': 'blen',
+    'እየሩሳሌም': 'jerusalem', 'ኢየሩሳሌም': 'jerusalem', 'የሩሳሌም': 'jerusalem', 'ዬሩሳሌም': 'jerusalem',
+    'ዮርዳኖስ': 'yordanos', 'ዮረዳኖስ': 'yordanos',
+    'ናታኔም': 'natanem', 'ናታነም': 'natanem', 'ናታንኤም': 'natanem',
+    'ጳውሎስ': 'pawlos', 'ፓውሎስ': 'pawlos',
+    'ሳባ': 'saba', 'ሳቫ': 'saba',
+    'ዘካሪያስ': 'zakarias', 'ዘካርያስ': 'zakarias', 'ዘከሪያስ': 'zakarias',
+    'ክብሩ': 'kibru leab', 'ክብሩ ለአብ': 'kibru leab', 'ክብረ አብ': 'kibru leab', 'ክብሩለአብ': 'kibru leab', 'ክብረአብ': 'kibru leab',
+    'ሳምራዊት': 'samrawit', 'ሳምሪ': 'samrawit',
+    'መሰረት': 'meseret', 'መሠረት': 'meseret', 'መስረት': 'meseret',
+    'ማርያም አዊት': 'maryam awit', 'ማርያማዊት': 'maryam awit', 'ማሪያማዊት': 'maryam awit',
+
     # Additional standard names
-    'ቤተልሔም': 'betelhem', 'ቤቴልሔም': 'betelhem', 'ቤተልሄም': 'betelhem',
+    'ቤተልሔም': 'betlehem', 'ቤቴልሔም': 'betlehem', 'ቤተልሄም': 'betlehem',
     'ቤተማርያም': 'betemariam', 'ቤተማሪያም': 'betemariam',
     'ነቢዩ': 'nebiyu', 'ነብዩ': 'nebiyu',
     'ዮስቲና': 'yostena', 'ዮስቴና': 'yostena',
