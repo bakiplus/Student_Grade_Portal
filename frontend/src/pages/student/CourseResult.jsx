@@ -82,7 +82,7 @@ export default function CourseResult() {
           <div className="student-id-tag">የተማሪ መታወቂያ፡ {result.student_id || user?.student_id}</div>
           <h2 className="student-name-heading">{result.student_name || `${user?.first_name} ${user?.last_name}`}</h2>
           <div className="student-meta-row">
-            <span>📚 <strong>ኮርስ፡</strong> {result.course_code} — {result.course_name}</span>
+            <span>📚 <strong>፡</strong> {result.course_code} — {result.course_name}</span>
           </div>
         </div>
       </div>
@@ -109,7 +109,7 @@ export default function CourseResult() {
             className={`badge ${result.passed ? 'badge-success' : 'badge-error'}`}
             style={{ fontSize: 'var(--font-size-sm)', padding: 'var(--space-2) var(--space-5)' }}
           >
-            {result.passed ? '✅ አልፏል (PASSED)' : '❌ ወድቋል (FAILED)'}
+            {result.passed ? '✅ አልፏል/ለች (PASSED)' : '❌ ወድቋል (FAILED)'}
           </span>
         </div>
       </div>
