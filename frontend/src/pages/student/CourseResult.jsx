@@ -133,8 +133,8 @@ export default function CourseResult() {
             <tr>
               <th>የግምገማ/የፈተና ክፍል</th>
               <th>የተገኘ ውጤት</th>
-              <th>ከፍተኛ ውጤት</th>
-              <th>መቶኛ ድርሻ</th>
+              {/* <th>ከፍተኛ ውጤት</th>
+              <th>መቶኛ ድርሻ</th> */}
               <th>የተሰላ ውጤት</th>
             </tr>
           </thead>
