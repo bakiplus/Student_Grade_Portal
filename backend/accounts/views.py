@@ -168,14 +168,15 @@ class StudentListCreateView(generics.ListCreateAPIView):
         return UserSerializer
 
     def get_queryset(self):
-        queryset = User.objects.filter(role='student')
-        search = self.request.query_params.get('search', '')
+        queryset = User.objects.filter(role='student').order_by('student_id', 'last_name', 'first_name')
+        search = self.request.query_params.get('search', '').strip()
         if search:
             queryset = queryset.filter(
                 models.Q(first_name__icontains=search)
                 | models.Q(last_name__icontains=search)
                 | models.Q(student_id__icontains=search)
                 | models.Q(username__icontains=search)
+                | models.Q(email__icontains=search)
             )
         return queryset
 

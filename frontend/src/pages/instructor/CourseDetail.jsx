@@ -125,8 +125,8 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
 
   const fetchStudents = async () => {
     try {
-      const res = await api.get(`/courses/${courseId}/students/`);
-      setStudents(res.data.results || res.data);
+      const res = await api.get(`/courses/${courseId}/students/?page_size=1000`);
+      setStudents(res.data.results || res.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -136,9 +136,10 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
 
   const openEnrollModal = async () => {
     try {
-      const res = await api.get('/auth/students/');
-      setAllStudents(res.data.results || res.data);
+      const res = await api.get('/auth/students/?page_size=1000');
+      setAllStudents(res.data.results || res.data || []);
       setSelectedStudents([]);
+      setSearch('');
       setShowEnrollModal(true);
     } catch (err) {
       console.error(err);
@@ -175,10 +176,21 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
   const enrolledIds = new Set(students.map((e) => e.student_detail?.id || e.student));
   const availableStudents = allStudents.filter((s) => !enrolledIds.has(s.id));
   const filteredAvailable = availableStudents.filter((s) =>
-    `${s.first_name} ${s.last_name} ${s.student_id} ${s.username}`
+    `${s.first_name} ${s.last_name} ${s.student_id} ${s.username} ${s.email || ''}`
       .toLowerCase()
       .includes(search.toLowerCase())
   );
+
+  const handleSelectAll = () => {
+    const allFilteredIds = filteredAvailable.map((s) => s.id);
+    const newSelected = Array.from(new Set([...selectedStudents, ...allFilteredIds]));
+    setSelectedStudents(newSelected);
+  };
+
+  const handleDeselectAll = () => {
+    const filteredSet = new Set(filteredAvailable.map((s) => s.id));
+    setSelectedStudents(selectedStudents.filter((id) => !filteredSet.has(id)));
+  };
 
   if (loading) {
     return <div className="loading-container"><div className="spinner" /></div>;
@@ -186,7 +198,7 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
         <h3 style={{ color: 'var(--text-primary)', fontWeight: 600 }}>
           የተመዘገቡ ተማሪዎች ({students.length})
         </h3>
@@ -224,7 +236,7 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
                     <td>
                       <StudentAvatar student={s} size="sm" />
                     </td>
-                    <td><span className="badge badge-info">{s?.student_id}</span></td>
+                    <td><span className="badge badge-info">{s?.student_id || '—'}</span></td>
                     <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>
                       {s?.first_name} {s?.last_name}
                     </td>
@@ -249,34 +261,61 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
       {/* Enroll Modal */}
       {showEnrollModal && (
         <div className="modal-overlay" onClick={() => setShowEnrollModal(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 540 }}>
             <div className="modal-header">
               <div className="modal-title">ተማሪዎችን በኮርሱ መዝግብ</div>
               <button className="btn btn-ghost" onClick={() => setShowEnrollModal(false)}>✕</button>
             </div>
             <div className="modal-body">
               <input
-                className="form-input mb-4"
-                placeholder="ተማሪዎችን በስም ወይም መታወቂያ ፈልግ..."
+                className="form-input mb-3"
+                placeholder="ተማሪዎችን በስም፣ በመታወቂያ ቁጥር ወይም በኢሜይል ፈልግ..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
+                autoFocus
               />
+
+              <div className="flex justify-between items-center mb-3 flex-wrap gap-2">
+                <span className="text-muted" style={{ fontSize: 'var(--font-size-xs)' }}>
+                  የሚገኙ ተማሪዎች፡ <strong>{filteredAvailable.length}</strong> (የተመረጡ፡ {selectedStudents.length})
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    style={{ fontSize: 'var(--font-size-xs)', padding: '2px 8px' }}
+                    onClick={handleSelectAll}
+                  >
+                    ✓ ሁሉንም ምረጥ
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    style={{ fontSize: 'var(--font-size-xs)', padding: '2px 8px' }}
+                    onClick={handleDeselectAll}
+                  >
+                    ✕ አትምረጥ
+                  </button>
+                </div>
+              </div>
+
               {filteredAvailable.length === 0 ? (
-                <p className="text-muted" style={{ fontSize: 'var(--font-size-sm)' }}>
+                <p className="text-muted" style={{ fontSize: 'var(--font-size-sm)', padding: 'var(--space-4)', textAlign: 'center' }}>
                   ምንም የሚመዘገብ ተማሪ አልተገኘም።
                 </p>
               ) : (
-                <div style={{ maxHeight: 300, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+                <div style={{ maxHeight: 360, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
                   {filteredAvailable.map((s) => (
                     <label
                       key={s.id}
                       className="flex items-center gap-3"
                       style={{
-                        padding: 'var(--space-3)',
+                        padding: 'var(--space-2) var(--space-3)',
                         borderRadius: 'var(--radius-md)',
                         cursor: 'pointer',
-                        background: selectedStudents.includes(s.id) ? 'rgba(99,102,241,0.12)' : 'transparent',
-                        transition: 'background 0.15s',
+                        background: selectedStudents.includes(s.id) ? 'rgba(99,102,241,0.14)' : 'rgba(255,255,255,0.03)',
+                        border: selectedStudents.includes(s.id) ? '1px solid var(--accent-primary)' : '1px solid transparent',
+                        transition: 'all 0.15s',
                       }}
                     >
                       <input
@@ -289,15 +328,18 @@ function StudentsTab({ courseId, onMessage, onRefresh }) {
                             setSelectedStudents(selectedStudents.filter((id) => id !== s.id));
                           }
                         }}
-                        style={{ accentColor: 'var(--accent-primary)' }}
+                        style={{ accentColor: 'var(--accent-primary)', width: 18, height: 18 }}
                       />
                       <StudentAvatar student={s} size="sm" />
-                      <div>
-                        <div style={{ fontWeight: 500, fontSize: 'var(--font-size-sm)' }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontWeight: 600, fontSize: 'var(--font-size-sm)', color: 'var(--text-primary)' }}>
                           {s.first_name} {s.last_name}
                         </div>
                         <div style={{ fontSize: 'var(--font-size-xs)', color: 'var(--text-muted)' }}>
-                          {s.student_id} · {s.username}
+                          <span className="badge badge-info" style={{ fontSize: '10px', padding: '1px 5px', marginRight: 6 }}>
+                            {s.student_id || 'ID የለውም'}
+                          </span>
+                          {s.username}
                         </div>
                       </div>
                     </label>

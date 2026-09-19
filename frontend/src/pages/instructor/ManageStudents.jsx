@@ -41,8 +41,8 @@ export default function ManageStudents() {
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/auth/students/');
-      setStudents(res.data.results || res.data);
+      const res = await api.get('/auth/students/?page_size=1000');
+      setStudents(res.data.results || res.data || []);
       setFetched(true);
     } catch (err) {
       console.error(err);

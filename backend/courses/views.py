@@ -148,11 +148,11 @@ class CourseStudentsView(generics.ListAPIView):
         if self.request.user.is_superuser or self.request.user.role == 'admin':
             return Enrollment.objects.filter(
                 course_id=self.kwargs['course_id'],
-            ).select_related('student')
+            ).select_related('student').order_by('student__student_id', 'student__last_name')
         return Enrollment.objects.filter(
             course_id=self.kwargs['course_id'],
             course__instructor=self.request.user,
-        ).select_related('student')
+        ).select_related('student').order_by('student__student_id', 'student__last_name')
 
 
 class RemoveStudentView(APIView):
