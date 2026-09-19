@@ -205,14 +205,44 @@ students_raw = [
     ("Yabsra", "Haylu", "STU-260117"),
     ("Mahilet", "Liul", "STU-260118"),
     ("Eyerusalem", "Berihun", "STU-260119"),
+
+    # Batch 5 Students (STU-260120 to STU-260147)
+    ("Philimon", "G/Wahid", "STU-260120"),
+    ("Sipara", "Matiwos", "STU-260121"),
+    ("Yalemwork", "Masresha", "STU-260122"),
+    ("Selome", "Alemeshet", "STU-260123"),
+    ("Tewodros", "Berihun", "STU-260124"),
+    ("Forehiwot", "Setegn", "STU-260125"),
+    ("Aster", "Yemataw", "STU-260126"),
+    ("Hiwot", "Adane", "STU-260127"),
+    ("Abeba", "Yigzaw", "STU-260128"),
+    ("Rahel", "Mekashaw", "STU-260129"),
+    ("Mulunesh", "Eyayu", "STU-260130"),
+    ("Kidusan", "Azanaw", "STU-260131"),
+    ("Nardos", "Shumet", "STU-260132"),
+    ("Helen", "Atanaw", "STU-260133"),
+    ("Moses", "Birhanu", "STU-260134"),
+    ("Dagmawit", "Yohans", "STU-260135"),
+    ("Eden", "Chalachew", "STU-260136"),
+    ("Meron", "Yalew", "STU-260137"),
+    ("Hana", "Getachew", "STU-260138"),
+    ("Etsubdink", "Fentahun", "STU-260139"),
+    ("Meseret", "Amsal", "STU-260140"),
+    ("Abiy", "Berihun", "STU-260141"),
+    ("Efrem", "Zinaw", "STU-260142"),
+    ("Samuel", "Adugna", "STU-260143"),
+    ("Biruk", "Tenaw", "STU-260144"),
+    ("Getachew", "Fente", "STU-260145"),
+    ("Betelhem", "Takele", "STU-260146"),
+    ("Betelhem", "Belay", "STU-260147"),
 ]
 
 students_data = []
 for (first_name, last_name, student_id) in students_raw:
     clean_first = first_name.strip()
     clean_last = last_name.strip()
-    clean_first_user = clean_first.lower().replace(' ', '').replace("'", "").replace("’", "").replace('/', '')
-    clean_last_user = clean_last.lower().replace(' ', '').replace("'", "").replace("’", "").replace('/', '')
+    clean_first_user = clean_first.lower().replace(' ', '').replace("'", "").replace("’", "").replace('/', '').replace('.', '')
+    clean_last_user = clean_last.lower().replace(' ', '').replace("'", "").replace("’", "").replace('/', '').replace('.', '')
     username = f"{clean_first_user}.{clean_last_user}"
     email = f"{clean_first_user}.{clean_last_user}@student.com"
 
