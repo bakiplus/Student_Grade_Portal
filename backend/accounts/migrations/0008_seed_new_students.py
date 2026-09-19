@@ -3,6 +3,40 @@ from django.db import migrations
 from django.contrib.auth.hashers import make_password
 
 
+ORIGINAL_STUDENTS = [
+    ("Nuhamin", "Abraham"),
+    ("Nuhamin", "Selamu"),
+    ("Nuhamin", "Bekele"),
+    ("Betelhem", "Dese"),
+    ("Betemariam", "Matewos"),
+    ("Nebiyu", "Samuel"),
+    ("Yostena", "Marshet"),
+    ("Tinsae", "Melaku"),
+    ("Eyasu", "Melkamu"),
+    ("Hana", "Amare"),
+    ("Sosina", "Solomon"),
+    ("Hermela", "Tariku"),
+    ("Mekdes", "Daniel"),
+    ("Eldana", "Amene"),
+    ("Kiber", "Yilkal"),
+    ("Yonas", "Asfaw"),
+    ("Tebarek", "Solomon"),
+    ("Dagim", "Fiseha"),
+    ("Yohannes", "Fiseha"),
+    ("Elias", "Birhanu"),
+    ("Kirubel", "Asefa"),
+    ("Beanchi", "Amlak Molla"),
+    ("Danawit", "Fentahun"),
+    ("Nardos", "Atanaw"),
+    ("Mihret", "Asemaraw"),
+    ("Meron", "Tefera"),
+    ("Roza", "Muluqen"),
+    ("Eitsubdink", "Dawit"),
+    ("Yeabsira", "Andargachew"),
+    ("Tsion", "Melaku"),
+    ("Elsabet", "Amare"),
+]
+
 NEW_STUDENTS = [
     ("Rakeb", "Tesfaye"),
     ("Etsgenet", "Tesfaye"),
@@ -30,13 +64,15 @@ NEW_STUDENTS = [
 def seed_new_students(apps, schema_editor):
     User = apps.get_model('accounts', 'User')
 
-    # Release any existing student_ids STU-260001 through STU-260099
-    # so we can reassign cleanly without unique constraint violation
+    # Release any existing student_ids STU-2600% temporarily
+    # so we can reassign cleanly without unique constraint collision
     for student in User.objects.filter(student_id__startswith='STU-26'):
         student.student_id = None
         student.save()
 
-    for index, (first_name, last_name) in enumerate(NEW_STUDENTS, start=1):
+    all_students = ORIGINAL_STUDENTS + NEW_STUDENTS
+
+    for index, (first_name, last_name) in enumerate(all_students, start=1):
         clean_first = first_name.strip()
         clean_last = last_name.strip()
         student_id = f"STU-26{index:04d}"
