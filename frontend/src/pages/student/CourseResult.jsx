@@ -109,7 +109,7 @@ export default function CourseResult() {
             className={`badge ${result.passed ? 'badge-success' : 'badge-error'}`}
             style={{ fontSize: 'var(--font-size-sm)', padding: 'var(--space-2) var(--space-5)' }}
           >
-            {result.passed ? '✅ አልፏል/ለች (PASSED)' : '❌ ወድቋል (FAILED)'}
+            {result.passed ? '✅ (PASSED)' : '❌ ወድቋል (FAILED)'}
           </span>
         </div>
       </div>
