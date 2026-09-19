@@ -50,35 +50,55 @@ class InstructorLoginSerializer(serializers.Serializer):
 
 
 AMHARIC_NAME_MAP = {
-    'ኑሃሚን': 'nuhamin', 'ኑሀሚን': 'nuhamin', 'ኑሐሚን': 'nuhamin',
-    'ቤተልሔም': 'betelhem', 'ቤቴልሔም': 'betelhem', 'ቤተልሄም': 'betelhem', 'ቤቴልሄም': 'betelhem', 'ቤተልኤም': 'betelhem',
-    'ቤተማርያም': 'betemariam', 'ቤተማሪያም': 'betemariam', 'ቤተ ማርያም': 'betemariam',
+    # 20 Students
+    'ራኬብ': 'rakeb', 'ራኪብ': 'rakeb',
+    'እፅገነት': 'etsgenet', 'እጽገነት': 'etsgenet', 'እትስገነት': 'etsgenet',
+    'ማህሌት': 'mahlet', 'ማሕሌት': 'mahlet', 'ማህለት': 'mahlet',
+    'በእምነት': 'beemnet', 'በዕምነት': 'beemnet', 'በእምነቴ': 'beemnet',
+    'ማክዳ': 'makda',
+    'ሳሎሜ': 'salome', 'ሰሎሜ': 'salome',
+    'ቤዛዊት': 'bezawit', 'ቤዛ': 'bezawit',
+    'ሮዳስ': 'rodas', 'ሮዳ': 'rodas',
+    'ኤዶም': 'edom', 'እዶም': 'edom',
+    'የምስራች': 'yemisirach', 'የምስራጭ': 'yemisirach',
+    'ሜሎስ': 'melos', 'መሎስ': 'melos',
+    'ኑአሚን': 'nuamin', 'ኑሃሚን': 'nuamin', 'ኑሀሚን': 'nuamin', 'ኑሐሚን': 'nuamin',
+    'አብሳላት': 'absalat', 'አብሳላ': 'absalat',
+    'ያብስራ': 'yabsira', 'የአብስራ': 'yabsira', 'የዓብስራ': 'yabsira',
+    'ፊሊሞን': 'philemon', 'ፊሌሞን': 'philemon', 'ፊልሞን': 'philemon',
+    'አቤል': 'abel', 'አበል': 'abel',
+    'ዳንኤል': 'daniel', 'ዳኒኤል': 'daniel',
+    'ዮሴፍ': 'yoseph', 'ዮስፍ': 'yoseph', 'ዮሲፍ': 'yoseph',
+    'ሱራፌል': 'surafel', 'ሱራፈል': 'surafel', 'ሱራፊል': 'surafel',
+    'ዮናታን': 'yonatan',
+
+    # Additional standard names
+    'ቤተልሔም': 'betelhem', 'ቤቴልሔም': 'betelhem', 'ቤተልሄም': 'betelhem',
+    'ቤተማርያም': 'betemariam', 'ቤተማሪያም': 'betemariam',
     'ነቢዩ': 'nebiyu', 'ነብዩ': 'nebiyu',
-    'ዮስቲና': 'yostena', 'ዮስቴና': 'yostena', 'ዮስቴነ': 'yostena',
-    'ትንሣኤ': 'tinsae', 'ትንሳኤ': 'tinsae', 'ትንሳይ': 'tinsae',
+    'ዮስቲና': 'yostena', 'ዮስቴና': 'yostena',
+    'ትንሣኤ': 'tinsae', 'ትንሳኤ': 'tinsae',
     'እያሱ': 'eyasu', 'ኢያሱ': 'eyasu',
     'ሃና': 'hana', 'ሐና': 'hana', 'ሀና': 'hana',
     'ሶስና': 'sosina', 'ሶሲና': 'sosina',
-    'ሄርሜላ': 'hermela', 'ሔርሜላ': 'hermela', 'ሄርመላ': 'hermela',
+    'ሄርሜላ': 'hermela', 'ሔርሜላ': 'hermela',
     'መቅደስ': 'mekdes',
     'ኤልዳና': 'eldana',
-    'ክብር': 'kiber', 'ክብረ': 'kiber', 'ኪበር': 'kiber',
+    'ክብር': 'kiber',
     'ዮናስ': 'yonas',
     'ተባረክ': 'tebarek',
-    'ዳግም': 'dagim', 'ዳጊም': 'dagim',
-    'ዮሐንስ': 'yohannes', 'ዮሃንስ': 'yohannes', 'ዮሀንስ': 'yohannes',
-    'ኤልያስ': 'elias', 'ኢልያስ': 'elias',
-    'ኪሩቤል': 'kirubel', 'ኪሩበል': 'kirubel',
-    'ባንቺ': 'beanchi', 'በአንቺ': 'beanchi', 'ቢያንቺ': 'beanchi', 'ባንቺአምላክ': 'beanchi',
+    'ዳግም': 'dagim',
+    'ዮሐንስ': 'yohannes',
+    'ኤልያስ': 'elias',
+    'ኪሩቤል': 'kirubel',
     'ዳናዊት': 'danawit',
     'ናርዶስ': 'nardos',
-    'ምሕረት': 'mihret', 'ምህረት': 'mihret',
-    'ሜሮን': 'meron', 'መሮን': 'meron',
+    'ምሕረት': 'mihret',
+    'ሜሮን': 'meron',
     'ሮዛ': 'roza',
-    'ዕፁብድንቅ': 'eitsubdink', 'እጹብድንቅ': 'eitsubdink', 'እፁብድንቅ': 'eitsubdink', 'እጹብ': 'eitsubdink',
-    'የአብስራ': 'yeabsira', 'የዓብስራ': 'yeabsira', 'ያብስራ': 'yeabsira',
-    'ጽዮን': 'tsion', 'ፂዮን': 'tsion', 'ፅዮን': 'tsion', 'ጺዮን': 'tsion',
-    'ኤልሳቤጥ': 'elsabet', 'ኤልሳቤት': 'elsabet', 'ኤልሳበት': 'elsabet',
+    'ዕፁብድንቅ': 'eitsubdink', 'እጹብድንቅ': 'eitsubdink',
+    'ጽዮን': 'tsion', 'ፂዮን': 'tsion',
+    'ኤልሳቤጥ': 'elsabet', 'ኤልሳቤት': 'elsabet',
 }
 
 
@@ -111,20 +131,30 @@ class StudentLoginSerializer(serializers.Serializer):
         if not student.is_active:
             raise serializers.ValidationError("ይህ የተማሪ አካውንት ተዘግቷል (This student account has been deactivated).")
 
-        # Normalize input first name (take first word if student entered full name)
-        first_word = raw_first_name.split()[0].lower() if raw_first_name else ''
-        mapped_name = AMHARIC_NAME_MAP.get(raw_first_name, AMHARIC_NAME_MAP.get(first_word, first_word))
+        # Normalize input first name
+        def clean_str(s):
+            return (s or '').lower().replace("'", "").replace("’", "").replace("-", "").strip()
 
-        db_first_name = (student.first_name or '').strip().lower()
-        db_full_name = (student.get_full_name() or '').strip().lower()
+        first_word = raw_first_name.split()[0] if raw_first_name else ''
+        mapped_name = AMHARIC_NAME_MAP.get(raw_first_name, AMHARIC_NAME_MAP.get(first_word, ''))
+
+        db_first = (student.first_name or '').strip().lower()
+        clean_db_first = clean_str(student.first_name)
+        db_full = (student.get_full_name() or '').strip().lower()
+        clean_db_full = clean_str(student.get_full_name())
+
+        clean_input = clean_str(raw_first_name)
+        clean_first_word = clean_str(first_word)
 
         # Verify match with English name, Amharic transliteration, or full name
         is_match = (
-            mapped_name == db_first_name or
-            first_word == db_first_name or
-            raw_first_name.lower() == db_first_name or
-            db_first_name in raw_first_name.lower() or
-            (mapped_name and mapped_name in db_full_name)
+            (mapped_name and mapped_name == clean_db_first) or
+            (mapped_name and mapped_name in clean_db_full) or
+            clean_first_word == clean_db_first or
+            clean_input == clean_db_first or
+            clean_db_first in clean_input or
+            clean_input in clean_db_full or
+            raw_first_name.lower() in db_full
         )
 
         if not is_match:

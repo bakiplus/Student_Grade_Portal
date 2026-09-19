@@ -102,45 +102,34 @@ for data in instructors_data:
 # ─── Create Students (with Profile Avatars) ───────────────────────────────────
 
 students_raw = [
-    ("Nuhamin", "Abraham"),
-    ("Nuhamin", "Selamu"),
-    ("Nuhamin", "Bekele"),
-    ("Betelhem", "Dese"),
-    ("Betemariam", "Matewos"),
-    ("Nebiyu", "Samuel"),
-    ("Yostena", "Marshet"),
-    ("Tinsae", "Melaku"),
-    ("Eyasu", "Melkamu"),
-    ("Hana", "Amare"),
-    ("Sosina", "Solomon"),
-    ("Hermela", "Tariku"),
-    ("Mekdes", "Daniel"),
-    ("Eldana", "Amene"),
-    ("Kiber", "Yilkal"),
-    ("Yonas", "Asfaw"),
-    ("Tebarek", "Solomon"),
-    ("Dagim", "Fiseha"),
-    ("Yohannes", "Fiseha"),
-    ("Elias", "Birhanu"),
-    ("Kirubel", "Asefa"),
-    ("Beanchi", "Amlak Molla"),
-    ("Danawit", "Fentahun"),
-    ("Nardos", "Atanaw"),
-    ("Mihret", "Asemaraw"),
-    ("Meron", "Tefera"),
-    ("Roza", "Muluqen"),
-    ("Eitsubdink", "Dawit"),
-    ("Yeabsira", "Andargachew"),
-    ("Tsion", "Melaku"),
-    ("Elsabet", "Amare"),
+    ("Rakeb", "Tesfaye"),
+    ("Etsgenet", "Tesfaye"),
+    ("Mahlet", "Solomon"),
+    ("Be'Emnet", "Kendu"),
+    ("Makda", "Getaneh"),
+    ("Salome", "Asemaraw"),
+    ("Bezawit", "Birhane"),
+    ("Rodas", "Abebe"),
+    ("Edom", "Mulualem"),
+    ("Yemisirach", "Baya"),
+    ("Melos", "Yigzaw"),
+    ("Nuamin", "Melaku"),
+    ("Absalat", "Selamsew"),
+    ("Yabsira", "Dawit"),
+    ("Philemon", "Fasil"),
+    ("Abel", "Sigtetaw"),
+    ("Daniel", "Yoseph"),
+    ("Yoseph", "Marshet"),
+    ("Surafel", "Dejen"),
+    ("Yonatan", "Abiy"),
 ]
 
 students_data = []
 for index, (first_name, last_name) in enumerate(students_raw, start=1):
     clean_first = first_name.strip()
     clean_last = last_name.strip()
-    clean_first_user = clean_first.lower().replace(' ', '')
-    clean_last_user = clean_last.lower().replace(' ', '')
+    clean_first_user = clean_first.lower().replace(' ', '').replace("'", "").replace("’", "")
+    clean_last_user = clean_last.lower().replace(' ', '').replace("'", "").replace("’", "")
     username = f"{clean_first_user}.{clean_last_user}"
     email = f"{clean_first_user}.{clean_last_user}@student.com"
     student_id = f"STU-26{index:04d}"
@@ -252,8 +241,8 @@ for course in courses:
 
 enrollment_map = {
     'CS101': students,
-    'MATH201': students[:20],
-    'ENG102': students[10:],
+    'MATH201': students,
+    'ENG102': students,
 }
 
 for course in courses:
