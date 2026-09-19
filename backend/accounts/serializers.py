@@ -49,26 +49,88 @@ class InstructorLoginSerializer(serializers.Serializer):
         return data
 
 
+AMHARIC_NAME_MAP = {
+    'ኑሃሚን': 'nuhamin', 'ኑሀሚን': 'nuhamin', 'ኑሐሚን': 'nuhamin',
+    'ቤተልሔም': 'betelhem', 'ቤቴልሔም': 'betelhem', 'ቤተልሄም': 'betelhem', 'ቤቴልሄም': 'betelhem', 'ቤተልኤም': 'betelhem',
+    'ቤተማርያም': 'betemariam', 'ቤተማሪያም': 'betemariam', 'ቤተ ማርያም': 'betemariam',
+    'ነቢዩ': 'nebiyu', 'ነብዩ': 'nebiyu',
+    'ዮስቲና': 'yostena', 'ዮስቴና': 'yostena', 'ዮስቴነ': 'yostena',
+    'ትንሣኤ': 'tinsae', 'ትንሳኤ': 'tinsae', 'ትንሳይ': 'tinsae',
+    'እያሱ': 'eyasu', 'ኢያሱ': 'eyasu',
+    'ሃና': 'hana', 'ሐና': 'hana', 'ሀና': 'hana',
+    'ሶስና': 'sosina', 'ሶሲና': 'sosina',
+    'ሄርሜላ': 'hermela', 'ሔርሜላ': 'hermela', 'ሄርመላ': 'hermela',
+    'መቅደስ': 'mekdes',
+    'ኤልዳና': 'eldana',
+    'ክብር': 'kiber', 'ክብረ': 'kiber', 'ኪበር': 'kiber',
+    'ዮናስ': 'yonas',
+    'ተባረክ': 'tebarek',
+    'ዳግም': 'dagim', 'ዳጊም': 'dagim',
+    'ዮሐንስ': 'yohannes', 'ዮሃንስ': 'yohannes', 'ዮሀንስ': 'yohannes',
+    'ኤልያስ': 'elias', 'ኢልያስ': 'elias',
+    'ኪሩቤል': 'kirubel', 'ኪሩበል': 'kirubel',
+    'ባንቺ': 'beanchi', 'በአንቺ': 'beanchi', 'ቢያንቺ': 'beanchi', 'ባንቺአምላክ': 'beanchi',
+    'ዳናዊት': 'danawit',
+    'ናርዶስ': 'nardos',
+    'ምሕረት': 'mihret', 'ምህረት': 'mihret',
+    'ሜሮን': 'meron', 'መሮን': 'meron',
+    'ሮዛ': 'roza',
+    'ዕፁብድንቅ': 'eitsubdink', 'እጹብድንቅ': 'eitsubdink', 'እፁብድንቅ': 'eitsubdink', 'እጹብ': 'eitsubdink',
+    'የአብስራ': 'yeabsira', 'የዓብስራ': 'yeabsira', 'ያብስራ': 'yeabsira',
+    'ጽዮን': 'tsion', 'ፂዮን': 'tsion', 'ፅዮን': 'tsion', 'ጺዮን': 'tsion',
+    'ኤልሳቤጥ': 'elsabet', 'ኤልሳቤት': 'elsabet', 'ኤልሳበት': 'elsabet',
+}
+
+
 class StudentLoginSerializer(serializers.Serializer):
-    """Validates student login via Student ID and First Name."""
+    """Validates student login via Student ID and First Name (supports English & Amharic)."""
     student_id = serializers.CharField(required=True)
     first_name = serializers.CharField(required=True)
 
     def validate(self, data):
-        student_id = data['student_id'].strip().upper()
-        first_name = data['first_name'].strip()
+        raw_student_id = data['student_id'].strip()
+        student_id_upper = raw_student_id.upper()
+        raw_first_name = data['first_name'].strip()
 
-        try:
-            student = User.objects.get(student_id__iexact=student_id, role='student')
-        except User.DoesNotExist:
-            raise serializers.ValidationError("Student ID not found. Please verify your ID.")
+        # Try exact student_id match
+        student = User.objects.filter(student_id__iexact=student_id_upper, role='student').first()
+
+        # If not found, try flexible student_id (e.g. user entered "260001" instead of "STU-260001")
+        if not student:
+            clean_num = student_id_upper.replace('STU', '').replace('-', '').strip()
+            if clean_num:
+                student = User.objects.filter(student_id__icontains=clean_num, role='student').first()
+
+        # Fallback to username if student ID wasn't recognized
+        if not student:
+            student = User.objects.filter(username__iexact=raw_student_id, role='student').first()
+
+        if not student:
+            raise serializers.ValidationError("የተማሪ መታወቂያ አልተገኘም። እባክዎ መታወቂያ ቁጥርዎን ያረጋግጡ (Student ID not found).")
 
         if not student.is_active:
-            raise serializers.ValidationError("This student account has been deactivated.")
+            raise serializers.ValidationError("ይህ የተማሪ አካውንት ተዘግቷል (This student account has been deactivated).")
 
-        # Check first name (case-insensitive match for convenience)
-        if not student.first_name or student.first_name.strip().lower() != first_name.lower():
-            raise serializers.ValidationError("First name does not match the record for this Student ID.")
+        # Normalize input first name (take first word if student entered full name)
+        first_word = raw_first_name.split()[0].lower() if raw_first_name else ''
+        mapped_name = AMHARIC_NAME_MAP.get(raw_first_name, AMHARIC_NAME_MAP.get(first_word, first_word))
+
+        db_first_name = (student.first_name or '').strip().lower()
+        db_full_name = (student.get_full_name() or '').strip().lower()
+
+        # Verify match with English name, Amharic transliteration, or full name
+        is_match = (
+            mapped_name == db_first_name or
+            first_word == db_first_name or
+            raw_first_name.lower() == db_first_name or
+            db_first_name in raw_first_name.lower() or
+            (mapped_name and mapped_name in db_full_name)
+        )
+
+        if not is_match:
+            raise serializers.ValidationError(
+                f"የመጀመሪያ ስም ከዚህ መታወቂያ ({student.student_id}) ጋር አይዛመድም። እባክዎ በትክክል ያስገቡ።"
+            )
 
         data['user'] = student
         return data

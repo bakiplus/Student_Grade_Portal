@@ -5,10 +5,26 @@
 
 import axios from 'axios';
 
-// Support production backend domain or local proxy
-const apiBase = import.meta.env.VITE_API_URL 
-  ? (import.meta.env.VITE_API_URL.endsWith('/') ? `${import.meta.env.VITE_API_URL}api` : `${import.meta.env.VITE_API_URL}/api`)
-  : '/api';
+// Support production backend domain, Vercel deployment, or local proxy
+const getApiBase = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim() !== '') {
+    const clean = envUrl.trim().replace(/\/+$/, '');
+    return clean.endsWith('/api') ? clean : `${clean}/api`;
+  }
+  // In production (Vercel or custom domain), connect directly to live Render backend
+  if (
+    import.meta.env.PROD ||
+    (typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1')
+  ) {
+    return 'https://student-grade-portal-2222.onrender.com/api';
+  }
+  return '/api';
+};
+
+const apiBase = getApiBase();
 
 const api = axios.create({
   baseURL: apiBase,

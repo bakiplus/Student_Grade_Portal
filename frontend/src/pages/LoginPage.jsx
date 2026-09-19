@@ -31,12 +31,19 @@ export default function LoginPage({ mode: initialMode = 'student' }) {
       await loginStudent(studentId.trim(), firstName.trim());
       navigate('/student/dashboard');
     } catch (err) {
-      const msg =
+      let msg =
         err.response?.data?.non_field_errors?.[0] ||
         err.response?.data?.detail ||
         err.response?.data?.student_id?.[0] ||
-        err.response?.data?.first_name?.[0] ||
-        'የተማሪ መታወቂያ ወይም የመጀመሪያ ስም አልተገኘም። እባክዎ በትክክል ያስገቡ።';
+        err.response?.data?.first_name?.[0];
+
+      if (!msg) {
+        if (err.message === 'Network Error' || !err.response) {
+          msg = 'ከሰርቨሩ ጋር መገናኘት አልተቻለም። እባክዎ ኢንተርኔትዎን ያረጋግጡ (Server is starting or offline).';
+        } else {
+          msg = 'የተማሪ መታወቂያ ወይም የመጀመሪያ ስም አልተገኘም። እባክዎ በትክክል ያስገቡ።';
+        }
+      }
       setError(msg);
     } finally {
       setLoading(false);
@@ -52,12 +59,19 @@ export default function LoginPage({ mode: initialMode = 'student' }) {
       await loginInstructor(username.trim(), password);
       navigate('/instructor/dashboard');
     } catch (err) {
-      const msg =
+      let msg =
         err.response?.data?.non_field_errors?.[0] ||
         err.response?.data?.detail ||
         err.response?.data?.username?.[0] ||
-        err.response?.data?.password?.[0] ||
-        'የተሳሳተ የተጠቃሚ ስም ወይም የይለፍ ቃል።';
+        err.response?.data?.password?.[0];
+
+      if (!msg) {
+        if (err.message === 'Network Error' || !err.response) {
+          msg = 'ከሰርቨሩ ጋር መገናኘት አልተቻለም። እባክዎ ኢንተርኔትዎን ያረጋግጡ (Server is starting or offline).';
+        } else {
+          msg = 'የተሳሳተ የተጠቃሚ ስም ወይም የይለፍ ቃል።';
+        }
+      }
       setError(msg);
     } finally {
       setLoading(false);
